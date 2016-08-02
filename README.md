@@ -1,0 +1,80 @@
+ansible-role-deployment_user
+===========================
+
+An Ansible role to setup a (system) deployment user and (system) deployment group.
+
+Requirements
+------------
+(on host that executes module)
+
+    useradd
+    userdel
+    usermod
+
+Inventory Example
+-----------------
+
+    [deployment_user]
+    system_01 ansible_ssh_user=some_existing_admin
+
+
+
+Role Variables
+--------------
+
+### defaults/main.yml example
+
+    ---
+    # defaults file for ansible-role-deployment_user
+    
+    deployment_user                 : 'deploy'
+    deployment_user_uid             : '990'
+    
+    deployment_user_system_groups   : [ "{{ deployment_user }}" ]
+    deployment_user_home_gid        : '990'
+    deployment_user_home_group     : '{{ deployment_user_system_groups[0] }}'
+    deployment_user_sudo_group     : '{{ deployment_user }}'
+    
+    deployment_user_home            : '{{ "/home/" + deployment_user }}'
+    deployment_user_home_mode       : '0750'
+    
+    deployment_user_shell           : '/bin/bash'
+    deployment_user_comment         : 'Ansible deployment user'
+    
+    deployment_users_public_sshkeys : [ '{{ lookup("pipe","ssh-add -L | grep ^ssh || cat ~/.ssh/id_rsa.pub || true") }}'
+ ]
+
+    deployment_sudoers_d_files:
+    
+      etc_sudoers.d:
+    
+        src: 'etc/sudoers.d/{{ deployment_user_sudo_group }}'
+        owner : root
+        group : root
+        mode  : 0400
+
+Dependencies
+------------
+
+A list of other roles hosted on Galaxy should go here, plus any details in regards to parameters that may need to be set for other roles, or variables that are used from other roles.
+
+Example Playbook
+----------------
+
+    ---
+    - hosts: deployment_user
+      user: some_existing_admin
+      become: true
+      gather_facts: true
+      roles:
+        - ansible-role-deployment_user
+
+License
+-------
+
+GNU
+
+Author
+------
+
+This role is a minimal interpretation of the Debops ansible-bootstrap role which can be found here > https://github.com/debops/ansible-bootstrap

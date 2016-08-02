@@ -1,0 +1,79 @@
+---
+# tasks file for ansible-role-bootstrap
+
+# do we want a specific user id / group id  ? 999:999 ?
+
+- name: Create specified system groups
+  group:
+    name  : '{{ item }}'
+    gid   : '{{ deployment_user_home_gid }}'
+    state : 'present'
+    system: True
+  with_items: '{{ deployment_user_system_groups }}'
+
+- name: "ensure that our deployment user exists and is a system account"
+  user:
+    name: '{{ deployment_user }}'
+    uid      : '{{ deployment_user_uid }}'
+    state    : 'present'
+    system   : True
+    group    : '{{ deployment_user_home_group }}'
+    groups   : '{{ deployment_user_system_groups | join(",") }}'
+    append   : True
+    home     : '{{ deployment_user_home }}'
+    shell    : '{{ deployment_user_shell }}'
+    comment  : '{{ deployment_user_comment }}'
+
+
+- name: "Add the deployment users public sshkey(s) to the remote users authorized_keys file."
+  authorized_key:
+    user  : '{{ deployment_user }}'
+    key   : '{{ "\n".join(deployment_users_public_sshkeys) | string }}'
+    state : 'present'
+  failed_when: (deployment_users_public_sshkeys is undefined or
+                (deployment_users_public_sshkeys is defined and not deployment_users_public_sshkeys))
+
+# template our sudo users sudoers.d file and give ansible managed header
+
+- name: "template any sudoer.d (group) files"
+  template:
+    backup: yes
+    src   : '{{ ansible_distribution }}/{{ ansible_distribution_version }}/{{ item.value.src }}'
+    dest  : '/{{ item.value.src }}'
+    owner : '{{ item.value.owner }}'
+    group : '{{ item.value.group }}'
+    mode  : '{{ item.value.mode }}'
+  with_dict: "{{ deployment_sudoers_d_files }}"
+
+- name: "Configure deployment users system group with passwordless access for sudo"
+  lineinfile:
+    dest     : '/etc/sudoers.d/{{ deployment_user_sudo_group }}'
+    regexp   : '{{ item.regexp }}'
+    line     : '{{ item.line }}'
+    state    : 'present'
+    create   : True
+    owner    : 'root'
+    group    : 'root'
+    mode     : '0440'
+    validate : 'visudo -cf %s'
+  with_items:
+    - regexp: '^Defaults: %{{ deployment_user_sudo_group }} env_check\s'
+      line:    'Defaults: %{{ deployment_user_sudo_group }} env_check += "SSH_CLIENT"'
+    - regexp: '^%{{ deployment_user_sudo_group }}\s'
+      line:    '%{{ deployment_user_sudo_group }} ALL = (ALL:ALL) NOPASSWD: SETENV: ALL'
+
+- name: "Ensure /etc/sudoers includes /etc/sudoers.d"
+  lineinfile:
+    dest     : '/etc/sudoers'
+    regexp   : '^#includedir\s+/etc/sudoers.d$'
+    line     : '#includedir /etc/sudoers.d'
+    state    : 'present'
+    validate : 'visudo -cf %s'
+
+- name: "Ensure that our deployment account user is in our deployment users passwordless sudo group"
+  user:
+    name   : '{{ deployment_user }}'
+    state  : 'present'
+    groups : '{{ deployment_user_sudo_group }}'
+    append : True
+  
