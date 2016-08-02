@@ -53,10 +53,14 @@ Role Variables
         group : root
         mode  : 0400
 
+### templates/Ubuntu/12.04/etc/sudoers.d/deploy.js
+
+You will want to rename the `deploy.js` template to match your sudo group name if you change it in defaults/main.yml
+
 Dependencies
 ------------
 
-A list of other roles hosted on Galaxy should go here, plus any details in regards to parameters that may need to be set for other roles, or variables that are used from other roles.
+Does not depend on other roles nor global variables.
 
 Example Playbook
 ----------------

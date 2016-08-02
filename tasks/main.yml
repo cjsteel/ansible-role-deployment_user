@@ -38,7 +38,7 @@
 - name: "template any sudoer.d (group) files"
   template:
     backup: yes
-    src   : '{{ ansible_distribution }}/{{ ansible_distribution_version }}/{{ item.value.src }}'
+    src   : '{{ ansible_distribution }}/{{ ansible_distribution_version }}/{{ item.value.src }}.j2'
     dest  : '/{{ item.value.src }}'
     owner : '{{ item.value.owner }}'
     group : '{{ item.value.group }}'
