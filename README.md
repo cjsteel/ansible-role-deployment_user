@@ -15,7 +15,7 @@ Inventory Example
 -----------------
 
     [deployment_user]
-    system_01 ansible_ssh_user=some_existing_admin
+    system_01 ansible_ssh_user=some_preexisting_admin
 
 
 
@@ -41,8 +41,7 @@ Role Variables
     deployment_user_shell           : '/bin/bash'
     deployment_user_comment         : 'Ansible deployment user'
     
-    deployment_users_public_sshkeys : [ '{{ lookup("pipe","ssh-add -L | grep ^ssh || cat ~/.ssh/id_rsa.pub || true") }}'
- ]
+    deployment_users_public_sshkeys : [ '{{ lookup("pipe","ssh-add -L | grep ^ssh || cat ~/.ssh/id_rsa.pub || true") }}' ]
 
     deployment_sudoers_d_files:
     
@@ -53,21 +52,24 @@ Role Variables
         group : root
         mode  : 0400
 
+Templates
+---------
+
 ### templates/Ubuntu/12.04/etc/sudoers.d/deploy.js
 
-You will want to rename the `deploy.js` template to match your sudo group name if you change it in defaults/main.yml
+You will want to rename `deploy.js` template to match your sudo group name if you change it in defaults/main.yml.
 
 Dependencies
 ------------
 
-Does not depend on other roles nor global variables.
+Does not depend on other roles nor global variables when used with the provided defaults/main.yml file.
 
 Example Playbook
 ----------------
 
     ---
     - hosts: deployment_user
-      user: some_existing_admin
+      user: some_preexisting_admin
       become: true
       gather_facts: true
       roles:
