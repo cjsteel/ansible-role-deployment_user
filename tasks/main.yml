@@ -7,15 +7,16 @@
   group:
     name  : '{{ item }}'
     gid   : '{{ deployment_user_home_gid }}'
-    state : 'present'
+    state : '{{ deployment_user_system_groups_state }}'
     system: True
   with_items: '{{ deployment_user_system_groups }}'
+  when: "'{{ deployment_user_state }}' == 'present'"
 
 - name: "ensure that our deployment user exists and is a system account"
   user:
     name: '{{ deployment_user }}'
     uid      : '{{ deployment_user_uid }}'
-    state    : 'present'
+    state    : '{{ deployment_user_state }}'
     system   : True
     group    : '{{ deployment_user_home_group }}'
     groups   : '{{ deployment_user_system_groups | join(",") }}'
@@ -29,7 +30,7 @@
   authorized_key:
     user  : '{{ deployment_user }}'
     key   : '{{ "\n".join(deployment_users_public_sshkeys) | string }}'
-    state : 'present'
+    state : '{{ deployment_users_public_sshkeys_state }}'
   failed_when: (deployment_users_public_sshkeys is undefined or
                 (deployment_users_public_sshkeys is defined and not deployment_users_public_sshkeys))
 
@@ -38,12 +39,22 @@
 - name: "template any sudoer.d (group) files"
   template:
     backup: yes
-    src   : '{{ ansible_distribution }}/{{ ansible_distribution_version }}/{{ item.value.src }}.j2'
-    dest  : '/{{ item.value.src }}'
+    src   : '{{ ansible_distribution }}/{{ ansible_distribution_version }}/{{ item.value.src }}'
+    dest  : '{{ item.value.dest }}'
     owner : '{{ item.value.owner }}'
     group : '{{ item.value.group }}'
     mode  : '{{ item.value.mode }}'
   with_dict: "{{ deployment_sudoers_d_files }}"
+  when: "'{{ deployment_user_state }}' == 'present'"
+
+- name: Create specified system groups
+  group:
+    name  : '{{ item }}'
+    gid   : '{{ deployment_user_home_gid }}'
+    state : '{{ deployment_user_system_groups_state }}'
+    system: True
+  with_items: '{{ deployment_user_system_groups }}'
+  when: "'{{ deployment_user_system_groups_state }}' == 'present'"
 
 - name: "Configure deployment users system group with passwordless access for sudo"
   lineinfile:
@@ -61,6 +72,8 @@
       line:    'Defaults: %{{ deployment_user_sudo_group }} env_check += "SSH_CLIENT"'
     - regexp: '^%{{ deployment_user_sudo_group }}\s'
       line:    '%{{ deployment_user_sudo_group }} ALL = (ALL:ALL) NOPASSWD: SETENV: ALL'
+  when: "'{{ deployment_user_sudo_group_state }}' == 'present'"
+
 
 - name: "Ensure /etc/sudoers includes /etc/sudoers.d"
   lineinfile:
@@ -76,4 +89,11 @@
     state  : 'present'
     groups : '{{ deployment_user_sudo_group }}'
     append : True
+  when: "'{{ deployment_user_sudo_group_state }}' == 'present'"
   
+- name: "Delete sudoers.d group file when state is set to absent"
+  file:
+    path   : '/etc/sudoers.d/{{ deployment_user_sudo_group }}'
+    state  : 'absent'
+  when: "'{{ deployment_user_sudo_group_state }}' == 'absent'"
+
