@@ -22,32 +22,58 @@ Inventory Example
 Role Variables
 --------------
 
+### group_vars/deployment_user
+
+You can overiding three default variables via group_vars to get rolling quickly as follows:
+
+    mkdir -p group_vars/deployment_user
+    nano -p group_vars/deployment_user/default.yml
+
+#### Minimal content example
+
+    ---
+    deployment_user        : 'deploy'
+    deployment_user_uid    : '879'
+    deployment_user_state  : 'present'
+ 
 ### defaults/main.yml example
+
+If you want to do a lot of customization you can overide all of the items in defaults/main.yml
 
     ---
     # defaults file for ansible-role-deployment_user
     
     deployment_user                 : 'deploy'
-    deployment_user_uid             : '990'
+    deployment_user_uid             : '878'
+    deployment_user_state           : 'absent'
     
-    deployment_user_system_groups   : [ "{{ deployment_user }}" ]
-    deployment_user_home_gid        : '990'
+    deployment_user_system_groups       : [ "{{ deployment_user }}" ]
+    # this probably shoud be skipped for now
+    deployment_user_system_groups_state : '{{ deployment_user_state }}'
+    
+    deployment_user_home_gid       : '{{ deployment_user_uid }}'
     deployment_user_home_group     : '{{ deployment_user_system_groups[0] }}'
-    deployment_user_sudo_group     : '{{ deployment_user }}'
     
+    deployment_user_sudo_group        : '{{ deployment_user }}'
+    deployment_user_sudo_group_state  : '{{ deployment_user_state }}'
+    
+    # !!! DANGER in most cases home directories should only be removed after archiving!!!
     deployment_user_home            : '{{ "/home/" + deployment_user }}'
     deployment_user_home_mode       : '0750'
+    # deployment_user_home_state      : 'absent' # not implemented
     
     deployment_user_shell           : '/bin/bash'
     deployment_user_comment         : 'Ansible deployment user'
     
-    deployment_users_public_sshkeys : [ '{{ lookup("pipe","ssh-add -L | grep ^ssh || cat ~/.ssh/id_rsa.pub || true") }}' ]
-
+    deployment_users_public_sshkeys       : [ '{{ lookup("pipe","ssh-add -L | grep ^ssh || cat ~/.ssh/id_rsa.pub || true") }}' ]
+    deployment_users_public_sshkeys_state : '{{ deployment_user_state }}'
+    
     deployment_sudoers_d_files:
     
       etc_sudoers.d:
     
-        src: 'etc/sudoers.d/{{ deployment_user_sudo_group }}'
+        src   : 'etc/sudoers.d/sudoers_group.j2'
+        dest  : '/etc/sudoers.d/{{ deployment_user_sudo_group }}'
         owner : root
         group : root
         mode  : 0400

@@ -1,5 +1,5 @@
 ---
-# defaults file for ansible-role-bootstrap
+# defaults file for ansible-role-deployment_user
 
 deployment_user                 : 'deploy'
 deployment_user_uid		: '878'
