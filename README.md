@@ -15,9 +15,7 @@ Inventory Example
 -----------------
 
     [deployment_user]
-    system_01 ansible_ssh_user=some_preexisting_admin
-
-
+    system_01 ansible_ssh_user=some_preexisting_admin_user
 
 Role Variables
 --------------
@@ -35,6 +33,21 @@ You can overiding three default variables via group_vars to get rolling quickly 
     deployment_user        : 'deploy'
     deployment_user_uid    : '879'
     deployment_user_state  : 'present'
+
+#### Usage as a dependancy
+
+You could probably use this role as a dependancy, I have not tried this yet.
+
+##### deployment_user/meta.yml
+Add something like this to the dependencies section of the roles meta/main.yml file. I usually move dependencies section to the top of the file so that it is readily noticable.
+
+
+    dependencies:
+
+      - { role: deployment_user, deployment_user: 'deploy', deployment_user_uid: '879', deployment_user_state : 'present' }
+      - { role: deployment_user, deployment_user: 'ubuntu', deployment_user_state: 'absent' }
+      - { role: deployment_user, deployment_user: 'vagrant', deployment_user_state: 'absent' }
+
  
 ### defaults/main.yml example
 
