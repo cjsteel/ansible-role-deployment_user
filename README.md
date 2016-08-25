@@ -17,20 +17,42 @@ Inventory Example
     [deployment_user]
     system_01 ansible_ssh_user=some_preexisting_admin_user
 
+Example Playbook
+----------------
+
+You can copy the example here:
+
+    cp roles/deployment_user/files/deployment_user.yml .
+
+### Example playbook contents:
+
+    ---
+    - hosts: deployment_user
+      user: aceadmin
+      become: true
+      gather_facts: false
+      roles:
+        - deployment_user
+
+
 Role Variables
 --------------
 
 ### group_vars/deployment_user
 
-You can overiding three default variables via group_vars to get rolling quickly as follows:
+To overide the three required variables via group_vars try this from your projects root directory:
 
     mkdir -p group_vars/deployment_user
-    nano -p group_vars/deployment_user/default.yml
+    cp roles/deployment_user/files/group_vars/deployment_user/deployment_user group_vars/deployment_user/default
+
+Then customize to suit your setup:
+
+    vim group_vars/deployment_user/default
 
 #### Minimal content example
 
     ---
-    deployment_user        : 'deploy'
+    deployment_user        : 'your_deployment_user'
     deployment_user_uid    : '879'
     deployment_user_state  : 'present'
 
