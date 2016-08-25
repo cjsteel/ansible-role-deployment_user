@@ -3,6 +3,13 @@
 
 # do we want a specific user id / group id  ? 999:999 ?
 
+- name: install requirements
+  become: true
+  yum: name=libselinux-python state=installed
+  when: ansible_distribution == 'CentOS'
+  tags: [ 'packages', 'shorewall' ]
+
+
 - name: Create specified system groups
   group:
     name  : '{{ item }}'
@@ -39,7 +46,7 @@
 - name: "template any sudoer.d (group) files"
   template:
     backup: yes
-    src   : '{{ ansible_distribution }}/{{ ansible_distribution_version }}/{{ item.value.src }}'
+    src   : '{{ ansible_distribution }}/{{ ansible_distribution_major_version }}/{{ item.value.src }}'
     dest  : '{{ item.value.dest }}'
     owner : '{{ item.value.owner }}'
     group : '{{ item.value.group }}'
