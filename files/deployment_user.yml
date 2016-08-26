@@ -2,7 +2,7 @@
 - hosts: deployment_user
   user: aceadmin
   become: true
-  gather_facts: false
+  gather_facts: true
   roles:
     - deployment_user
 
