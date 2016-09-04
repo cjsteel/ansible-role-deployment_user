@@ -15,8 +15,7 @@ Items required on the target OS for the Ansible **user** module:
 Inventory file
 --------------
 
-Testing example
-===============
+### Testing example
 
     cp ../ace_test_vms/ansible/inventory/vagrant_ansible_inventory inventory_dev
 
@@ -25,12 +24,10 @@ Testing example
     web ansible_ssh_host=127.0.0.1 ansible_ssh_port=2222 ansible_ssh_private_key_file=/home/cjs/projects/ace_testing/ace_test_vms/.vagrant/machines/web/virtualbox/private_key ansible_ssh_user=vagrant
     #db ansible_ssh_host=127.0.0.1 ansible_ssh_port=2200 ansible_ssh_private_key_file=/home/cjs/projects/ace_testing/ace_test_vms/.vagrant/machines/db/virtualbox/private_key ansible_ssh_user=vagrant
 
-Production example
-==================
+### Production example
 
     [deployment_user]
     system_01 ansible_ssh_user=some_preexisting_admin_user
-
 
 Role Variables
 --------------
@@ -51,21 +48,22 @@ Then customize to suit your setup:
     deployment_user_uid    : '1001'
     deployment_user_state  : 'present'
 
-Ansible.cfg
------------
+Projects Ansible.cfg
+--------------------
 
     [defaults]
     # has ansible doing full logging
     log_path = ../ace_logs/ansible.log
     hostname = inventory_dev
 
-Ansible playbook
-----------------
+Ansible playbooks
+-----------------
 
-Main Playbook
-=============
+### Main Playbook
 
     nano testing_parc.yml
+
+#### Content example
 
     ---
     - hosts: all
@@ -74,12 +72,12 @@ Main Playbook
     
     - include: deployment_user.yml
 
-Role Playbook
-=============
+### Role Playbook
+
 
     nano deployment_user.yml
 
-### Testing example
+#### Testing example
 
 You can copy the testing example here:
 
@@ -93,7 +91,7 @@ You can copy the testing example here:
       roles:
         - deployment_user
 
-### Production example
+#### Production example
 
     ---
     - hosts: deployment_user
@@ -106,14 +104,13 @@ You can copy the testing example here:
 SSH
 ---
 
-vagrant ssh-config
-==================
+### vagrant ssh-config
 
-From the vagrant directory run:
+From the vagrant vm directory run:
 
     vagrant ssh-config
 
-### Output example
+#### Output example
 
     Host web
       HostName 127.0.0.1
@@ -139,7 +136,7 @@ From the vagrant directory run:
 
 ### Build your ssh command
 
-Using the above output as a reference build your initial ssh commands to connect 
+Using the output from `vagrant ssh-config` as a reference, build your initial ssh connection command(s).
 
     ssh vagrant@localhost -p 2222 -i /home/cjs/projects/ace_testing/ace_test_vms/.vagrant/machines/web/virtualbox/private_key
     ssh vagrant@localhost -p 2200 -i /home/cjs/projects/ace_testing/ace_test_vms/.vagrant/machines/db/virtualbox/private_key
@@ -148,19 +145,18 @@ Using the above output as a reference build your initial ssh commands to connect
     ECDSA key fingerprint is 3a:3e:03:b9:70:71:cd:64:c4:be:f7:59:4f:ba:5c:bb.
     Are you sure you want to continue connecting (yes/no)? yes
 
-If your need to remove any stale host keys from the controllers ~/.ssh/known_hosts files you will need to run something like this before you try and connect:
+If your have created a new VM you may need to remove stale host keys from the controllers ~/.ssh/known_hosts files using `ssh-keygen -f` before connecting:
 
     ssh-keygen -f "/home/cjs/.ssh/known_hosts" -R [localhost]:2222
     ssh-keygen -f "/home/cjs/.ssh/known_hosts" -R [localhost]:2200
 
 Ansible Command
 ---------------
-Once you have set up all your target hosts in your controllers known_hosts file you are ready to create your deployment user.
+Once you have entries for all your target hosts in your controllers known_hosts file you are ready to run your `ansible-playbook` command and create your deployment user.
 
     ansible-playbook testing_parc.yml -i inventory_dev
 
-Confirm Connectivity
-====================
+### Confirm Connectivity
 
 Now that the new deployment user has been setup for usage with the controllers public ssh key you can connect via ssh with commands similar to this from now on:
 
@@ -173,7 +169,6 @@ You could probably use this role as a dependancy, I have not tried this yet.
 
 ##### deployment_user/meta.yml
 Add something like this to the dependencies section of the roles meta/main.yml file. I usually move dependencies section to the top of the file so that it is readily noticable.
-
 
     dependencies:
 
@@ -231,7 +226,6 @@ Templates
     Ubuntu/12.04/etc/sudoers.d/sudoers_group.j2 
     CentOS/6/etc/sudoers.d/sudoers_group.j2
     CentOS/7/etc/sudoers.d/sudoers_group.j2
-
 
 Dependencies
 ------------
