@@ -1,6 +1,6 @@
 ---
 - hosts: deployment_user
-  user: aceadmin
+  user: vagrant
   become: true
   gather_facts: true
   roles:
