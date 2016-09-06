@@ -52,7 +52,18 @@
     group : '{{ item.value.group }}'
     mode  : '{{ item.value.mode }}'
   with_dict: "{{ deployment_sudoers_d_files }}"
-  when: "'{{ deployment_user_state }}' == 'present'"
+  when: "'{{ deployment_user_state }}' == 'present' and '{{ ansible_distribution }}' == 'CentOS'"
+
+- name: "template any sudoer.d (group) files"
+  template:
+    backup: yes
+    src   : '{{ ansible_distribution }}/{{ ansible_distribution_version }}/{{ item.value.src }}'
+    dest  : '{{ item.value.dest }}'
+    owner : '{{ item.value.owner }}'
+    group : '{{ item.value.group }}'
+    mode  : '{{ item.value.mode }}'
+  with_dict: "{{ deployment_sudoers_d_files }}"
+  when: "'{{ deployment_user_state }}' == 'present' and '{{ ansible_distribution }}' == 'Ubuntu'"
 
 - name: Create specified system groups
   group:
