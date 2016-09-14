@@ -92,7 +92,6 @@
       line:    '%{{ deployment_user_sudo_group }} ALL = (ALL:ALL) NOPASSWD: SETENV: ALL'
   when: "'{{ deployment_user_sudo_group_state }}' == 'present'"
 
-
 - name: "Ensure /etc/sudoers includes /etc/sudoers.d"
   lineinfile:
     dest     : '/etc/sudoers'
