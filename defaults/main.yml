@@ -1,6 +1,11 @@
 ---
 # defaults file for ansible-role-deployment_user
 
+
+# three vars most people will change.
+#
+# overidden via group_vars/deployment_user/defaults.yml
+
 deployment_user                 : 'deploy'
 deployment_user_uid		: '878'
 deployment_user_state           : 'absent'
