@@ -1,6 +1,6 @@
 ---
 - hosts: deployment_user
-  user: vagrant
+  user: {{ deployment_user_user }}
   become: true
   gather_facts: true
   roles:

@@ -1,9 +1,0 @@
----
-# file: group_vars/deployment_user/deployment_user
-
-# Used to overide role/deployment_user/defaults/main.yml vars so that our deployment user is not commited to the roles repository.
-
-deployment_user                 : 'deployment_user_name'
-deployment_user_uid		: '1001' 
-deployment_user_state           : 'present'
-

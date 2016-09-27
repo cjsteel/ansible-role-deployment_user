@@ -32,14 +32,14 @@ Inventory file
 Role Variables
 --------------
 
-### group_vars/deployment_user
+### group_vars/deployment_user/defaults.yml
 
     mkdir -p group_vars/deployment_user
-    cp roles/deployment_user/files/group_vars/deployment_user/deployment_user group_vars/deployment_user/default
+    cp roles/deployment_user/files/group_vars/deployment_user/defaults.yml group_vars/deployment_user/.
 
-Then customize to suit your setup:
+### Customize to suit your setup:
 
-    nano group_vars/deployment_user/default
+    nano group_vars/deployment_user/defaults.yml
 
 #### Minimal content example
 
