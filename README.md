@@ -57,15 +57,15 @@ Role Variables
 
 ### group_vars/deployment_user/defaults.yml
 
-* Create a directory to hold group_vars
+Create a directory to hold group_vars
 
     mkdir -p group_vars/deployment_user
 
-* Copy the roles group_vars example file.
+Copy the roles group_vars example file.
 
     cp roles/deployment_user/files/group_vars/deployment_user/defaults.yml group_vars/deployment_user/.
 
-* Edit the roles group_vars file to match your setup.
+Edit the roles group_vars file to match your setup.
 
     nano group_vars/deployment_user/defaults
 
@@ -82,83 +82,6 @@ deployment_user_uid		: '1002'
 deployment_user_state   : 'present'
 ```
 
-Vagrant and SSH
----------------
-
-### vagrant ssh-config
-
-From the vagrant vm directory run:
-
-    vagrant ssh-config
-
-#### Output example
-
-    Host web
-      HostName 127.0.0.1
-      User vagrant
-      Port 2222
-      UserKnownHostsFile /dev/null
-      StrictHostKeyChecking no
-      PasswordAuthentication no
-      IdentityFile /home/controller_user/projects/project_name/vms/.vagrant/machines/web/virtualbox/private_key
-      IdentitiesOnly yes
-      LogLevel FATAL
-    
-    Host db
-      HostName 127.0.0.1
-      User vagrant
-      Port 2200
-      UserKnownHostsFile /dev/null
-      StrictHostKeyChecking no
-      PasswordAuthentication no
-      IdentityFile /home/controller_user/projects/project_name/vms/.vagrant/machines/db/virtualbox/private_key
-      IdentitiesOnly yes
-      LogLevel FATAL
-
-### Build your ssh command
-
-Using the output from `vagrant ssh-config` as a reference, build your initial ssh connection command(s).
-
-    ssh vagrant@localhost -p 2222 -i /home/controller_user/projects/project_name/vms/.vagrant/machines/web/virtualbox/private_key
-    ssh vagrant@localhost -p 2200 -i /home/controller_user/projects/project_name/vms/.vagrant/machines/db/virtualbox/private_key
-
-    The authenticity of host '[localhost]:2222 ([127.0.0.1]:2222)' can't be established.
-    ECDSA key fingerprint is ...
-    Are you sure you want to continue connecting (yes/no)? yes
-
-If your have created a new VM you may need to remove stale host keys from the controllers ~/.ssh/known_hosts files using `ssh-keygen -f` before connecting:
-
-    ssh-keygen -f "/home/controller_user/.ssh/known_hosts" -R [localhost]:2222
-    ssh-keygen -f "/home/controller_user/.ssh/known_hosts" -R [localhost]:2200
-
-### Confirm Connectivity
-
-Now that the new deployment user has been setup for usage with the controllers public ssh key you can connect via ssh with commands similar to this from now on:
-
-    ssh deploy@127.0.0.1 -p 2222
-    ssh deploy@127.0.0.1 -p 2200
-
-Ansible Command
----------------
-Once you have entries for all your target hosts in your controllers known_hosts file you are ready to run your `ansible-playbook` command and create your deployment user.
-
-    ansible-playbook system.yml -i inventory/development
-
-
-#### Usage as a dependancy
-
-You could probably use this role as a dependancy, I have not tried this yet.
-
-##### deployment_user/meta.yml
-
-Add something like this to the dependencies section of the roles meta/main.yml file. I usually move dependencies section to the top of the file so that it is readily noticable.
-
-    dependencies:
-
-      - { role: deployment_user, deployment_user: 'deploy', deployment_user_uid: '879', deployment_user_state : 'present' }
-      - { role: deployment_user, deployment_user: 'ubuntu', deployment_user_state: 'absent' }
-      - { role: deployment_user, deployment_user: 'vagrant', deployment_user_state: 'absent' }
- 
 ### defaults/main.yml example
 
 ```yaml
@@ -206,8 +129,14 @@ deployment_sudoers_d_files:
     mode  : 0440
 ```
 
-Templates
----------
+Ansible Command
+---------------
+Once you have entries for all your target hosts in your controllers known_hosts file you are ready to run your `ansible-playbook` command and create your deployment user.
+
+    ansible-playbook system.yml -i inventory/development
+
+Role Templates
+--------------
 
 `roles/deployment_user/templates` currently has the following templates:
 
@@ -217,10 +146,83 @@ Templates
     CentOS/6/etc/sudoers.d/sudoers_group.j2
     CentOS/7/etc/sudoers.d/sudoers_group.j2
 
+#### Usage as a dependancy
+
+You could probably use this role as a dependancy, I have not tried this yet.
+
+##### deployment_user/meta.yml
+
+Add something like this to the dependencies section of the roles meta/main.yml file. I usually move dependencies section to the top of the file so that it is readily noticable.
+
+    dependencies:
+
+      - { role: deployment_user, deployment_user: 'deploy', deployment_user_uid: '879', deployment_user_state : 'present' }
+      - { role: deployment_user, deployment_user: 'ubuntu', deployment_user_state: 'absent' }
+      - { role: deployment_user, deployment_user: 'vagrant', deployment_user_state: 'absent' }
+ 
+
 Dependencies
 ------------
 
 Does not depend on any other to roles. See **Requirements** for target OS requirements for the Ansible **user** modules.
+
+Vagrant and SSH
+---------------
+
+If you are running Vagrant this may be helpful...
+
+### vagrant ssh-config
+
+From the vagrant vm directory run:
+
+    vagrant ssh-config
+
+#### Output example
+
+    Host web
+      HostName 127.0.0.1
+      User vagrant
+      Port 2222
+      UserKnownHostsFile /dev/null
+      StrictHostKeyChecking no
+      PasswordAuthentication no
+      IdentityFile /home/controller_user/projects/project_name/vms/.vagrant/machines/web/virtualbox/private_key
+      IdentitiesOnly yes
+      LogLevel FATAL
+    
+    Host db
+      HostName 127.0.0.1
+      User vagrant
+      Port 2200
+      UserKnownHostsFile /dev/null
+      StrictHostKeyChecking no
+      PasswordAuthentication no
+      IdentityFile /home/controller_user/projects/project_name/vms/.vagrant/machines/db/virtualbox/private_key
+      IdentitiesOnly yes
+      LogLevel FATAL
+
+### Build your ssh commands
+
+Using the output from `vagrant ssh-config` as a reference, build your initial ssh connection command(s).
+
+    ssh vagrant@localhost -p 2222 -i /home/controller_user/projects/project_name/vms/.vagrant/machines/web/virtualbox/private_key
+    ssh vagrant@localhost -p 2200 -i /home/controller_user/projects/project_name/vms/.vagrant/machines/db/virtualbox/private_key
+
+    The authenticity of host '[localhost]:2222 ([127.0.0.1]:2222)' can't be established.
+    ECDSA key fingerprint is ...
+    Are you sure you want to continue connecting (yes/no)? yes
+
+If your have created a new VM you may need to remove stale host keys from the controllers ~/.ssh/known_hosts files using `ssh-keygen -f` before connecting:
+
+    ssh-keygen -f "/home/controller_user/.ssh/known_hosts" -R [localhost]:2222
+    ssh-keygen -f "/home/controller_user/.ssh/known_hosts" -R [localhost]:2200
+
+### Confirm Connectivity
+
+Now that the new deployment user has been setup for usage with the controllers public ssh key you can connect via ssh with commands similar to this from now on:
+
+    ssh deploy@127.0.0.1 -p 2222
+    ssh deploy@127.0.0.1 -p 2200
 
 License
 -------
