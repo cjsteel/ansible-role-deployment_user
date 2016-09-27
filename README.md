@@ -3,6 +3,11 @@ ansible-role-deployment_user
 
 An Ansible role to setup a (system) deployment user and (system) deployment group.
 
+Under Development
+-----------------
+
+This role is under development and may change significantly.
+
 Requirements
 ------------
 
@@ -12,8 +17,8 @@ Items required on the target OS for the Ansible **user** module:
     userdel
     usermod
 
-Role Playbook
--------------
+Role Playbooks
+--------------
 
 ### Project playbook
 
