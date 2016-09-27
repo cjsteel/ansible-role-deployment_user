@@ -50,6 +50,7 @@ Role Variables
 
 #### Minimal content example
 
+```yaml
     # file: group_vars/deployment_user/deployment_user
     #
     # Used to overide role/deployment_user/defaults/main.yml vars
@@ -58,6 +59,7 @@ Role Variables
     deployment_user         : 'your_deployment_user'
     deployment_user_uid		: '2001'
     deployment_user_state   : 'present'
+```
 
 Ansible playbook
 ----------------
@@ -68,12 +70,13 @@ Ansible playbook
 
 #### Content example
 
-    ---
-    - hosts: all
-      become: false
-    #  gather_facts: true
+```yaml
+---
+- hosts: all
+  become: false
     
-    - include: deployment_user.yml
+- include: deployment_user.yml
+```
 
 SSH
 ---
@@ -93,7 +96,7 @@ From the vagrant vm directory run:
       UserKnownHostsFile /dev/null
       StrictHostKeyChecking no
       PasswordAuthentication no
-      IdentityFile /home/cjs/projects/ace_testing/ace_test_vms/.vagrant/machines/web/virtualbox/private_key
+      IdentityFile /home/controller_user/projects/ace_testing/ace_test_vms/.vagrant/machines/web/virtualbox/private_key
       IdentitiesOnly yes
       LogLevel FATAL
     
@@ -104,7 +107,7 @@ From the vagrant vm directory run:
       UserKnownHostsFile /dev/null
       StrictHostKeyChecking no
       PasswordAuthentication no
-      IdentityFile /home/cjs/projects/ace_testing/ace_test_vms/.vagrant/machines/db/virtualbox/private_key
+      IdentityFile /home/controller_user/projects/ace_testing/ace_test_vms/.vagrant/machines/db/virtualbox/private_key
       IdentitiesOnly yes
       LogLevel FATAL
 
@@ -112,8 +115,8 @@ From the vagrant vm directory run:
 
 Using the output from `vagrant ssh-config` as a reference, build your initial ssh connection command(s).
 
-    ssh vagrant@localhost -p 2222 -i /home/cjs/projects/ace_testing/ace_test_vms/.vagrant/machines/web/virtualbox/private_key
-    ssh vagrant@localhost -p 2200 -i /home/cjs/projects/ace_testing/ace_test_vms/.vagrant/machines/db/virtualbox/private_key
+    ssh vagrant@localhost -p 2222 -i /home/controller_user/projects/ace_testing/ace_test_vms/.vagrant/machines/web/virtualbox/private_key
+    ssh vagrant@localhost -p 2200 -i /home/controller_user/projects/ace_testing/ace_test_vms/.vagrant/machines/db/virtualbox/private_key
 
     The authenticity of host '[localhost]:2222 ([127.0.0.1]:2222)' can't be established.
     ECDSA key fingerprint is 3a:3e:03:b9:70:71:cd:64:c4:be:f7:59:4f:ba:5c:bb.
@@ -121,8 +124,8 @@ Using the output from `vagrant ssh-config` as a reference, build your initial ss
 
 If your have created a new VM you may need to remove stale host keys from the controllers ~/.ssh/known_hosts files using `ssh-keygen -f` before connecting:
 
-    ssh-keygen -f "/home/cjs/.ssh/known_hosts" -R [localhost]:2222
-    ssh-keygen -f "/home/cjs/.ssh/known_hosts" -R [localhost]:2200
+    ssh-keygen -f "/home/controller_user/.ssh/known_hosts" -R [localhost]:2222
+    ssh-keygen -f "/home/controller_user/.ssh/known_hosts" -R [localhost]:2200
 
 Ansible Command
 ---------------
