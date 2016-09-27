@@ -15,9 +15,21 @@ Items required on the target OS for the Ansible **user** module:
 Role Playbook
 -------------
 
-You can copy the testing example here:
+### Project playbook
 
-    cp roles/deployment_user/files/deployment_user.yml .
+Example of a minimal main playbook containing our role playbook:
+
+```yaml
+---
+- hosts: all
+  become: false
+
+- include: deployment_user.yml
+```
+
+### Role playbook
+
+Example of our role playbook
 
 ```yaml
 ---
@@ -29,7 +41,11 @@ You can copy the testing example here:
     - deployment_user
 ```
 
-* You can set the deployment user var here or in group_vars/deployment_user/defaults.yml as shown in the **Role Variables** section.
+You can copy the example here if you like:
+
+    cp roles/deployment_user/files/deployment_user.yml .
+
+We will set the value for `deployment_user` in the next section using `group_vars`.
 
 Role Variables
 --------------
@@ -51,35 +67,18 @@ Role Variables
 #### Minimal content example
 
 ```yaml
-    # file: group_vars/deployment_user/deployment_user
-    #
-    # Used to overide role/deployment_user/defaults/main.yml vars
-    # so that our deployment user is not commited to the roles repository.
-    
-    deployment_user         : 'your_deployment_user'
-    deployment_user_uid		: '2001'
-    deployment_user_state   : 'present'
+# file: group_vars/deployment_user/deployment_user
+#
+# Used to overide role/deployment_user/defaults/main.yml vars
+# so that our deployment user is not commited to the roles repository.
+
+deployment_user         : 'your_deployment_user'
+deployment_user_uid		: '1002'
+deployment_user_state   : 'present'
 ```
 
-Ansible playbook
-----------------
-
-### Main Playbook
-
-    nano system.yml
-
-#### Content example
-
-```yaml
----
-- hosts: all
-  become: false
-    
-- include: deployment_user.yml
-```
-
-SSH
----
+Vagrant and SSH
+---------------
 
 ### vagrant ssh-config
 
@@ -96,7 +95,7 @@ From the vagrant vm directory run:
       UserKnownHostsFile /dev/null
       StrictHostKeyChecking no
       PasswordAuthentication no
-      IdentityFile /home/controller_user/projects/ace_testing/ace_test_vms/.vagrant/machines/web/virtualbox/private_key
+      IdentityFile /home/controller_user/projects/project_name/vms/.vagrant/machines/web/virtualbox/private_key
       IdentitiesOnly yes
       LogLevel FATAL
     
@@ -107,7 +106,7 @@ From the vagrant vm directory run:
       UserKnownHostsFile /dev/null
       StrictHostKeyChecking no
       PasswordAuthentication no
-      IdentityFile /home/controller_user/projects/ace_testing/ace_test_vms/.vagrant/machines/db/virtualbox/private_key
+      IdentityFile /home/controller_user/projects/project_name/vms/.vagrant/machines/db/virtualbox/private_key
       IdentitiesOnly yes
       LogLevel FATAL
 
@@ -115,23 +114,17 @@ From the vagrant vm directory run:
 
 Using the output from `vagrant ssh-config` as a reference, build your initial ssh connection command(s).
 
-    ssh vagrant@localhost -p 2222 -i /home/controller_user/projects/ace_testing/ace_test_vms/.vagrant/machines/web/virtualbox/private_key
-    ssh vagrant@localhost -p 2200 -i /home/controller_user/projects/ace_testing/ace_test_vms/.vagrant/machines/db/virtualbox/private_key
+    ssh vagrant@localhost -p 2222 -i /home/controller_user/projects/project_name/vms/.vagrant/machines/web/virtualbox/private_key
+    ssh vagrant@localhost -p 2200 -i /home/controller_user/projects/project_name/vms/.vagrant/machines/db/virtualbox/private_key
 
     The authenticity of host '[localhost]:2222 ([127.0.0.1]:2222)' can't be established.
-    ECDSA key fingerprint is 3a:3e:03:b9:70:71:cd:64:c4:be:f7:59:4f:ba:5c:bb.
+    ECDSA key fingerprint is ...
     Are you sure you want to continue connecting (yes/no)? yes
 
 If your have created a new VM you may need to remove stale host keys from the controllers ~/.ssh/known_hosts files using `ssh-keygen -f` before connecting:
 
     ssh-keygen -f "/home/controller_user/.ssh/known_hosts" -R [localhost]:2222
     ssh-keygen -f "/home/controller_user/.ssh/known_hosts" -R [localhost]:2200
-
-Ansible Command
----------------
-Once you have entries for all your target hosts in your controllers known_hosts file you are ready to run your `ansible-playbook` command and create your deployment user.
-
-    ansible-playbook testing_parc.yml -i inventory_dev
 
 ### Confirm Connectivity
 
@@ -140,11 +133,19 @@ Now that the new deployment user has been setup for usage with the controllers p
     ssh deploy@127.0.0.1 -p 2222
     ssh deploy@127.0.0.1 -p 2200
 
+Ansible Command
+---------------
+Once you have entries for all your target hosts in your controllers known_hosts file you are ready to run your `ansible-playbook` command and create your deployment user.
+
+    ansible-playbook system.yml -i inventory/development
+
+
 #### Usage as a dependancy
 
 You could probably use this role as a dependancy, I have not tried this yet.
 
 ##### deployment_user/meta.yml
+
 Add something like this to the dependencies section of the roles meta/main.yml file. I usually move dependencies section to the top of the file so that it is readily noticable.
 
     dependencies:
@@ -155,52 +156,59 @@ Add something like this to the dependencies section of the roles meta/main.yml f
  
 ### defaults/main.yml example
 
-All of the follwoing variables are avaialbe in defaults/main.yml. The first three 
+```yaml
+---
+# defaults/main.yml
+#
+#
+# three vars most people will change.
+#
+# overidden via group_vars/deployment_user/defaults.yml
 
-    ---
-    # defaults file for ansible-role-deployment_user
-    
-    deployment_user                 : 'deploy'
-    deployment_user_uid             : '1001'
-    deployment_user_state           : 'present'
-    
-    deployment_user_system_groups       : [ "{{ deployment_user }}" ]
-    # this probably shoud be skipped for now
-    deployment_user_system_groups_state : '{{ deployment_user_state }}'
-    
-    deployment_user_home_gid       : '{{ deployment_user_uid }}'
-    deployment_user_home_group     : '{{ deployment_user_system_groups[0] }}'
-    
-    deployment_user_sudo_group        : '{{ deployment_user }}'
-    deployment_user_sudo_group_state  : '{{ deployment_user_state }}'
-    
-    # !!! DANGER in most cases home directories should only be removed after archiving!!!
-    deployment_user_home            : '{{ "/home/" + deployment_user }}'
-    deployment_user_home_mode       : '0750'
-    # deployment_user_home_state      : 'absent' # not implemented
-    
-    deployment_user_shell           : '/bin/bash'
-    deployment_user_comment         : 'Ansible deployment user'
-    
-    deployment_users_public_sshkeys       : [ '{{ lookup("pipe","ssh-add -L | grep ^ssh || cat ~/.ssh/id_rsa.pub || true") }}' ]
-    deployment_users_public_sshkeys_state : '{{ deployment_user_state }}'
-    
-    deployment_sudoers_d_files:
-    
-      etc_sudoers.d:
-    
-        src   : 'etc/sudoers.d/sudoers_group.j2'
-        dest  : '/etc/sudoers.d/{{ deployment_user_sudo_group }}'
-        owner : root
-        group : root
-        mode  : 0400
+deployment_user                 : 'deploy'
+deployment_user_uid             : '878'
+deployment_user_state           : 'absent'
+
+deployment_user_system_groups       : [ "{{ deployment_user }}" ]
+# this probably shoud be skipped for now
+deployment_user_system_groups_state : '{{ deployment_user_state }}'
+
+deployment_user_home_gid            : '{{ deployment_user_uid }}'
+deployment_user_home_group          : '{{ deployment_user_system_groups[0] }}'
+
+deployment_user_sudo_group          : '{{ deployment_user }}'
+deployment_user_sudo_group_state    : '{{ deployment_user_state }}'
+
+# !!! DANGER in most cases home directories should only be removed after archiving!!!
+deployment_user_home                : '{{ "/home/" + deployment_user }}'
+deployment_user_home_mode           : '0750'
+# deployment_user_home_state        : 'absent' # not implemented
+
+deployment_user_shell           : '/bin/bash'
+deployment_user_comment         : 'Ansible deployment user'
+
+deployment_users_public_sshkeys       : [ '{{ lookup("pipe","ssh-add -L | grep ^ssh || cat ~/.ssh/id_rsa.pub || true") }}' ]
+deployment_users_public_sshkeys_state : '{{ deployment_user_state }}'
+
+deployment_sudoers_d_files:
+
+  etc_sudoers.d:
+
+    src   : 'etc/sudoers.d/sudoers_group.j2'
+    dest  : '/etc/sudoers.d/{{ deployment_user_sudo_group }}'
+    owner : root
+    group : root
+    mode  : 0440
+```
 
 Templates
 ---------
 
 `roles/deployment_user/templates` currently has the following templates:
 
-    Ubuntu/12.04/etc/sudoers.d/sudoers_group.j2 
+    Ubuntu/12.04/etc/sudoers.d/sudoers_group.j2
+    Ubuntu/14.04/etc/sudoers.d/sudoers_group.j2
+    Ubuntu/16.04/etc/sudoers.d/sudoers_group.j2
     CentOS/6/etc/sudoers.d/sudoers_group.j2
     CentOS/7/etc/sudoers.d/sudoers_group.j2
 
