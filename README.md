@@ -129,6 +129,18 @@ deployment_sudoers_d_files:
     mode  : 0440
 ```
 
+Inventory Example
+-----------------
+
+You inventory file needs to reference an existing admin user on the target system. If the target is a Vagrant VM, it would be **vagrant**, if you are targeting Ubuntu system, it might be **ubuntu**, CentOS, perhaps **root**.
+
+```yaml
+[deployment_user]
+ubuntu1.example.com ansible_ssh_user=existing_admin_user
+ubuntu2.example.com ansible_ssh_user=existing_admin_user
+ubuntu3.example.com ansible_ssh_user=existing_admin_user
+```
+
 Ansible Command
 ---------------
 Once you have entries for all your target hosts in your controllers known_hosts file you are ready to run your `ansible-playbook` command and create your deployment user.
@@ -178,22 +190,11 @@ From the vagrant vm directory run:
     vagrant ssh-config
 
 #### Output example
-
-    Host web
-      HostName 127.0.0.1
-      User vagrant
-      Port 2222
-      UserKnownHostsFile /dev/null
-      StrictHostKeyChecking no
-      PasswordAuthentication no
-      IdentityFile /home/controller_user/projects/project_name/vms/.vagrant/machines/web/virtualbox/private_key
-      IdentitiesOnly yes
-      LogLevel FATAL
-    
+  
     Host db
       HostName 127.0.0.1
       User vagrant
-      Port 2200
+      Port 2222
       UserKnownHostsFile /dev/null
       StrictHostKeyChecking no
       PasswordAuthentication no
@@ -205,19 +206,34 @@ From the vagrant vm directory run:
 
 Using the output from `vagrant ssh-config` as a reference, build your initial ssh connection command(s).
 
-    ssh vagrant@localhost -p 2222 -i /home/controller_user/projects/project_name/vms/.vagrant/machines/web/virtualbox/private_key
-    ssh vagrant@localhost -p 2200 -i /home/controller_user/projects/project_name/vms/.vagrant/machines/db/virtualbox/private_key
+#### Remove any stale keys
+
+If your have created a new VM you may need to remove stale host keys from the controllers ~/.ssh/known_hosts files using `ssh-keygen -f` before connecting:
+
+    ssh-keygen -f "/home/controller_user/.ssh/known_hosts" -R [127.0.0.1]:2222
+    ssh-keygen -f "/home/controller_user/.ssh/known_hosts" -R [localhost]:2222
+    ssh-keygen -f "/home/controller_user/.ssh/known_hosts" -R [db]:2222
+
+### Confirm Connectivity
+
+    ssh vagrant@localhost -p 2222 -i /home/controller_user/projects/project_name/vms/.vagrant/machines/db/virtualbox/private_key
 
     The authenticity of host '[localhost]:2222 ([127.0.0.1]:2222)' can't be established.
     ECDSA key fingerprint is ...
     Are you sure you want to continue connecting (yes/no)? yes
 
-If your have created a new VM you may need to remove stale host keys from the controllers ~/.ssh/known_hosts files using `ssh-keygen -f` before connecting:
+### Vagrant inventory example
 
-    ssh-keygen -f "/home/controller_user/.ssh/known_hosts" -R [localhost]:2222
-    ssh-keygen -f "/home/controller_user/.ssh/known_hosts" -R [localhost]:2200
+We specify our host, ssh port, private key location and our ansible ssh user when testing using Vagrant.
 
-### Confirm Connectivity
+```yaml
+[deployment_user]
+db ansible_ssh_host=127.0.0.1 ansible_ssh_port=2222 ansible_ssh_private_key_file=/home/controller_user/projects/project_name/vms/.vagrant/machines/db/virtualbox/private_key ansible_ssh_user=vagrant
+```
+
+### Run the deployment_user role
+
+### confirm your new deployment user
 
 Now that the new deployment user has been setup for usage with the controllers public ssh key you can connect via ssh with commands similar to this from now on:
 
