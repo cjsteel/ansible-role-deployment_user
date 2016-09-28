@@ -7,7 +7,7 @@
 # This way our deployment user and the deployment users uid 
 # does not get commited to roles' repository.
 
-deployment_user                 : 'deployment_user_name_goes_here'
-deployment_user_uid		: '1001' 
-deployment_user_state           : 'present'
+deployment_user_username    : 'deployment_user_name_goes_here'
+deployment_user_uid         : '1001' 
+deployment_user_state       : 'present'
 

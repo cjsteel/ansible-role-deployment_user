@@ -17,10 +17,10 @@ Items required on the target OS for the Ansible **user** module:
     userdel
     usermod
 
-Role Playbooks
---------------
+Playbooks
+---------
 
-### Project playbook
+### Main playbook
 
 Example of a minimal main playbook containing our role playbook:
 
@@ -32,6 +32,11 @@ Example of a minimal main playbook containing our role playbook:
 - include: deployment_user.yml
 ```
 
+Copy and edit included example if desired:
+
+    cp roles/deployment_user/files/system.yml .
+    nano system.yml
+
 ### Role playbook
 
 Example of our role playbook
@@ -39,50 +44,57 @@ Example of our role playbook
 ```yaml
 ---
 - hosts: deployment_user
-  user: {{ deployment_user }}
+  user: '{{ deployment_user_username }}'
   become: true
   gather_facts: true
   roles:
     - deployment_user
 ```
-
-You can copy the example here if you like:
-
-    cp roles/deployment_user/files/deployment_user.yml .
-
-We will set the value for `deployment_user` in the next section using `group_vars`.
-
-Role Variables
---------------
+## Roles' playbook
 
 ### group_vars/deployment_user/defaults.yml
 
-Create a directory to hold group_vars
+Before creating our role's playbook we will set values for at least the following three vars in `group_vars/deployment_user/defaults.yml`:
+
+    deployment_user_username
+    deployment_user_uid
+    
+and
+
+    deployment_user_state
+
+#### Create our directory structure
+
+First we create our 
 
     mkdir -p group_vars/deployment_user
 
-Copy the roles group_vars example file.
+#### Copy the roles group_vars example file.
 
     cp roles/deployment_user/files/group_vars/deployment_user/defaults.yml group_vars/deployment_user/.
 
-Edit the roles group_vars file to match your setup.
+#### Edit and save
 
-    nano group_vars/deployment_user/defaults
+Next we will edit the file and set our deployment_user name, user id and the users state (present or absent).
+
+    nano group_vars/deployment_user/defaults.yml
 
 #### Minimal content example
 
 ```yaml
-# file: group_vars/deployment_user/deployment_user
+# file: group_vars/deployment_user/defaults.yml
 #
 # Used to overide role/deployment_user/defaults/main.yml vars
 # so that our deployment user is not commited to the roles repository.
 
-deployment_user         : 'your_deployment_user'
-deployment_user_uid		: '1002'
-deployment_user_state   : 'present'
+deployment_user_username : 'your_deployment_user'
+deployment_user_uid	     : '808'
+deployment_user_state    : 'present'
 ```
 
 ### defaults/main.yml example
+
+All of our variables are located in `defaults/main.yml` so that they can be overidden via precidence via `group_vars` and/or `host_vars` as is the case for the first three.
 
 ```yaml
 ---
@@ -90,25 +102,25 @@ deployment_user_state   : 'present'
 #
 #
 # three vars most people will change.
-#
 # overidden via group_vars/deployment_user/defaults.yml
 
-deployment_user                 : 'deploy'
-deployment_user_uid             : '878'
-deployment_user_state           : 'absent'
+deployment_user_username : 'deployer'
+deployment_user_uid      : '808'
+deployment_user_state    : 'absent'
 
-deployment_user_system_groups       : [ "{{ deployment_user }}" ]
-# this probably shoud be skipped for now
+deployment_user_system_groups       : [ "{{ deployment_user_username }}" ]
+
+# perhaps implement later if required
 deployment_user_system_groups_state : '{{ deployment_user_state }}'
 
 deployment_user_home_gid            : '{{ deployment_user_uid }}'
 deployment_user_home_group          : '{{ deployment_user_system_groups[0] }}'
 
-deployment_user_sudo_group          : '{{ deployment_user }}'
+deployment_user_sudo_group          : '{{ deployment_user_username }}'
 deployment_user_sudo_group_state    : '{{ deployment_user_state }}'
 
 # !!! DANGER in most cases home directories should only be removed after archiving!!!
-deployment_user_home                : '{{ "/home/" + deployment_user }}'
+deployment_user_home                : '{{ "/home/" + deployment_user_username }}'
 deployment_user_home_mode           : '0750'
 # deployment_user_home_state        : 'absent' # not implemented
 
@@ -129,16 +141,27 @@ deployment_sudoers_d_files:
     mode  : 0440
 ```
 
-Inventory Example
------------------
+Inventory Examples
+------------------
 
-You inventory file needs to reference an existing admin user on the target system. If the target is a Vagrant VM, it would be **vagrant**, if you are targeting Ubuntu system, it might be **ubuntu**, CentOS, perhaps **root**.
+### Production
+
+CentOS production example
 
 ```yaml
 [deployment_user]
-ubuntu1.example.com ansible_ssh_user=existing_admin_user
-ubuntu2.example.com ansible_ssh_user=existing_admin_user
-ubuntu3.example.com ansible_ssh_user=existing_admin_user
+system-001 ansible_ssh_user=root
+system-002 ansible_ssh_user=root
+
+```
+
+### Development
+
+CentOS or Ubuntu example using an initial ansible_ssh_user called `vagrant`
+
+```yaml
+[deployment_user]
+db ansible_ssh_host=127.0.0.1 ansible_ssh_port=2222 ansible_ssh_private_key_file=/home/controller_user/projects/project_name/vms/.vagrant/machines/db/virtualbox/private_key ansible_ssh_user=vagrant
 ```
 
 Ansible Command
@@ -146,6 +169,14 @@ Ansible Command
 Once you have entries for all your target hosts in your controllers known_hosts file you are ready to run your `ansible-playbook` command and create your deployment user.
 
     ansible-playbook system.yml -i inventory/development
+
+### Testing
+
+To test your new deployment users connectivity you could use any of the following three:
+
+    ssh deployer@db -p 2222
+    ssh deployer@127.0.0.1 -p 2222
+    ssh deployer@localhost -p 2222
 
 Role Templates
 --------------
@@ -158,9 +189,9 @@ Role Templates
     CentOS/6/etc/sudoers.d/sudoers_group.j2
     CentOS/7/etc/sudoers.d/sudoers_group.j2
 
-#### Usage as a dependancy
+#### Usage as a dependency
 
-You could probably use this role as a dependancy, I have not tried this yet.
+You could probably use this role as a dependency, I have not tried this yet.
 
 ##### deployment_user/meta.yml
 
@@ -168,9 +199,9 @@ Add something like this to the dependencies section of the roles meta/main.yml f
 
     dependencies:
 
-      - { role: deployment_user, deployment_user: 'deploy', deployment_user_uid: '879', deployment_user_state : 'present' }
-      - { role: deployment_user, deployment_user: 'ubuntu', deployment_user_state: 'absent' }
-      - { role: deployment_user, deployment_user: 'vagrant', deployment_user_state: 'absent' }
+      - { role: deployment_user, deployment_user_username: 'deploy', deployment_user_uid: '879', deployment_user_state : 'present' }
+      - { role: deployment_user, deployment_user_username: 'ubuntu', deployment_user_state: 'absent' }
+      - { role: deployment_user, deployment_user_username: 'vagrant', deployment_user_state: 'absent' }
  
 
 Dependencies

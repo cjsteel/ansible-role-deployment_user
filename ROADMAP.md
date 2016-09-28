@@ -1,9 +1,16 @@
 # ROADMAP.md
 
-2016-08-26
+## Considering
 
-*  renamed deployment_user var to be deployment_user_name.
+* add dependency for role that tracks target systems current state / roles applied:
 
+  ../system_states/system-001/deployment_user-2016-09-28_11:54:06
+
+## Completed
+
+2016-09-28
+
+*  rename `deployment_user` var to `deployment_user_username` to avoid confusion.
 
 2016-08-04
 

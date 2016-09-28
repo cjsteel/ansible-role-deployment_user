@@ -1,0 +1,7 @@
+---
+# file: system.yml (site.yml)
+
+- hosts: all
+  become: false
+
+- include: deployment_user.yml

@@ -21,7 +21,7 @@
 
 - name: "ensure that our deployment user exists and is a system account"
   user:
-    name: '{{ deployment_user }}'
+    name: '{{ deployment_user_username }}'
     uid      : '{{ deployment_user_uid }}'
     state    : '{{ deployment_user_state }}'
     system   : True
@@ -35,7 +35,7 @@
 
 - name: "Add the deployment users public sshkey(s) to the remote users authorized_keys file."
   authorized_key:
-    user  : '{{ deployment_user }}'
+    user  : '{{ deployment_user_username }}'
     key   : '{{ "\n".join(deployment_users_public_sshkeys) | string }}'
     state : '{{ deployment_users_public_sshkeys_state }}'
   failed_when: (deployment_users_public_sshkeys is undefined or
@@ -102,7 +102,7 @@
 
 - name: "Ensure that our deployment account user is in our deployment users passwordless sudo group"
   user:
-    name   : '{{ deployment_user }}'
+    name   : '{{ deployment_user_username }}'
     state  : 'present'
     groups : '{{ deployment_user_sudo_group }}'
     append : True
