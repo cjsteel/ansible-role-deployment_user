@@ -50,19 +50,19 @@ and
 
     deployment_user_state
 
-#### Create our directory structure
+#### Create group_vars directory
 
-First we create our 
+First we create a directory to hold the group_vars related to our role.
 
     mkdir -p group_vars/deployment_user
 
-#### Copy the roles group_vars example file.
+#### Copy the example file.
 
     cp roles/deployment_user/files/group_vars/deployment_user/defaults.yml group_vars/deployment_user/.
 
 #### Edit and save
 
-Next we will edit the file and set our deployment_user name, user id and the users state (present or absent).
+Next we will edit the file and set our deployment users username, user id and the users state (present or absent).
 
     nano group_vars/deployment_user/defaults.yml
 
