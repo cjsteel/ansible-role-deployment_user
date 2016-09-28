@@ -22,7 +22,7 @@ Playbooks
 
 ### Main playbook
 
-Example of a minimal main playbook containing our role playbook:
+Example of a minimal main playbook that contains an include for our roles' playbook:
 
 ```yaml
 ---
@@ -37,20 +37,7 @@ Copy and edit included example if desired:
     cp roles/deployment_user/files/system.yml .
     nano system.yml
 
-### Role playbook
-
-Example of our role playbook
-
-```yaml
----
-- hosts: deployment_user
-  user: '{{ deployment_user_username }}'
-  become: true
-  gather_facts: true
-  roles:
-    - deployment_user
-```
-## Roles' playbook
+### Roles' playbook
 
 ### group_vars/deployment_user/defaults.yml
 
@@ -91,6 +78,27 @@ deployment_user_username : 'your_deployment_user'
 deployment_user_uid	     : '808'
 deployment_user_state    : 'present'
 ```
+### Role playbook
+
+Example of our roles' playbook
+
+```yaml
+---
+- hosts: deployment_user
+  user: '{{ deployment_user_username }}'
+  become: true
+  gather_facts: true
+  roles:
+    - deployment_user
+```
+
+To copy and edit the included example:
+
+    cp roles/deployment_user/files/deployment_user.yml .
+    nano deployment_user.yml
+
+Other Variables
+---------------
 
 ### defaults/main.yml example
 
