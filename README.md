@@ -34,8 +34,8 @@ Example of a minimal main playbook that contains an include for our roles' playb
 
 Copy and edit included example if desired:
 
-    cp roles/deployment_user/files/system.yml .
-    nano system.yml
+    cp roles/deployment_user/files/systems.yml .
+    nano systems.yml
 
 ### Roles' playbook
 
@@ -163,6 +163,18 @@ system-002 ansible_ssh_user=root
 
 ```
 
+Ansible Command
+---------------
+
+    ansible-playbook systems.yml -i inventory/development --ask-become-pass
+
+Connectivity Test
+-----------------
+
+Now you should be able to ssh in using your new deployment user with your ssh keypair for authentication.
+
+    ssh deployment_user@host
+
 ### Development
 
 CentOS or Ubuntu example using an initial ansible_ssh_user called `vagrant`
@@ -176,7 +188,7 @@ Ansible Command
 ---------------
 Once you have entries for all your target hosts in your controllers known_hosts file you are ready to run your `ansible-playbook` command and create your deployment user.
 
-    ansible-playbook system.yml -i inventory/development
+    ansible-playbook systems.yml -i inventory/development
 
 ### Testing
 
