@@ -10,14 +10,36 @@
   tags: [ 'packages', 'shorewall' ]
 
 
-- name: Create specified system groups
+- name: "Remove our deployment user when state is absent"
+  user:
+    name: '{{ deployment_user_username }}'
+    uid      : '{{ deployment_user_uid }}'
+    state    : 'absent'
+    system   : True
+    group    : '{{ deployment_user_home_group }}'
+    groups   : '{{ deployment_user_system_groups | join(",") }}'
+    append   : True
+    home     : '{{ deployment_user_home }}'
+    shell    : '{{ deployment_user_shell }}'
+    comment  : '{{ deployment_user_comment }}'
+  when: "'{{ deployment_user_state }}' == 'absent'"
+
+- name: "Ensure deployment user account user is removed from the deployment users passwordless sudo group"
+  user:
+    name   : '{{ deployment_user_username }}'
+    state  : 'absent'
+    groups : '{{ deployment_user_sudo_group }}'
+    append : True
+  when: "'{{ deployment_user_sudo_group_state }}' == 'present'"
+
+- name: Ensure specified system group(s) are present or absent.
   group:
     name  : '{{ item }}'
     gid   : '{{ deployment_user_home_gid }}'
     state : '{{ deployment_user_system_groups_state }}'
     system: True
   with_items: '{{ deployment_user_system_groups }}'
-  when: "'{{ deployment_user_state }}' == 'present'"
+#  when: "'{{ deployment_user_state }}' == 'present'"
 
 - name: "ensure that our deployment user exists and is a system account"
   user:
@@ -31,9 +53,9 @@
     home     : '{{ deployment_user_home }}'
     shell    : '{{ deployment_user_shell }}'
     comment  : '{{ deployment_user_comment }}'
+  when: "'{{ deployment_user_state }}' == 'present'"
 
-
-- name: "Add the deployment users public sshkey(s) to the remote users authorized_keys file."
+- name: "Add or remove the deployment users public sshkey(s) to the remote users authorized_keys file."
   authorized_key:
     user  : '{{ deployment_user_username }}'
     key   : '{{ "\n".join(deployment_users_public_sshkeys) | string }}'
@@ -42,6 +64,13 @@
                 (deployment_users_public_sshkeys is defined and not deployment_users_public_sshkeys))
 
 # template our sudo users sudoers.d file and give ansible managed header
+
+- name: delete users sudoer.d file when deployment user state is absent
+  file:
+    path  : '{{ item.value.dest }}'
+    state : 'absent'
+  with_dict: "{{ deployment_sudoers_d_files }}"
+  when: "'{{ deployment_user_state }}' == 'absent'"
 
 - name: "template any sudoer.d (group) files"
   template:
@@ -65,14 +94,14 @@
   with_dict: "{{ deployment_sudoers_d_files }}"
   when: "'{{ deployment_user_state }}' == 'present' and '{{ ansible_distribution }}' == 'Ubuntu'"
 
-- name: Create specified system groups
+- name: Create (or remove ) specified system groups
   group:
     name  : '{{ item }}'
     gid   : '{{ deployment_user_home_gid }}'
     state : '{{ deployment_user_system_groups_state }}'
     system: True
   with_items: '{{ deployment_user_system_groups }}'
-  when: "'{{ deployment_user_system_groups_state }}' == 'present'"
+#  when: "'{{ deployment_user_system_groups_state }}' == 'present'"
 
 - name: "Configure deployment users system group with passwordless access for sudo"
   lineinfile:
@@ -92,6 +121,7 @@
       line:    '%{{ deployment_user_sudo_group }} ALL = (ALL:ALL) NOPASSWD: SETENV: ALL'
   when: "'{{ deployment_user_sudo_group_state }}' == 'present'"
 
+
 - name: "Ensure /etc/sudoers includes /etc/sudoers.d"
   lineinfile:
     dest     : '/etc/sudoers'
@@ -99,6 +129,7 @@
     line     : '#includedir /etc/sudoers.d'
     state    : 'present'
     validate : 'visudo -cf %s'
+  when: "'{{ deployment_user_sudo_group_state }}' == 'present'"
 
 - name: "Ensure that our deployment account user is in our deployment users passwordless sudo group"
   user:

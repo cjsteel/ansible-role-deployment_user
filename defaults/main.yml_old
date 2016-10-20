@@ -39,5 +39,6 @@ deployment_sudoers_d_files:
     dest  : '/etc/sudoers.d/{{ deployment_user_sudo_group }}'
     owner : root
     group : root
+    state : '{{ deployment_user_state }}'
     mode  : '0440'
 
