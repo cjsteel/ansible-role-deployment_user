@@ -11,11 +11,25 @@ This role is under development and may change significantly.
 Requirements
 ------------
 
-Items required on the target OS for the Ansible **user** module:
+### Ansible
 
-    useradd
-    userdel
-    usermod
+#### ssh
+
+In order to connect, Ansible requires that ssh be installed
+
+```shell
+sudo apt-get install openssh-server -y
+```
+#### users module
+
+The Ansible user module requires the following on the target OS to support the Ansible **user** module:
+
+```shell
+useradd
+userdel
+usermod
+```
+
 
 Playbooks
 ---------
