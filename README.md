@@ -30,6 +30,33 @@ userdel
 usermod
 ```
 
+Setup
+-----
+
+### Setup ssh agent
+
+```shell
+eval `ssh-agent -s`
+/usr/bin/ssh-add
+```
+
+### Confirm connectivity
+
+```shell
+ssh <adminuser>@ace-ws-59
+exit
+```
+
+### Setup ssh key
+
+```shell
+ssh-copy-id <adminuser>@ace-ws-59
+exit
+```
+### Confirm
+
+```shell
+ssh <adminuser>@ace-ws-59
 
 Playbooks
 ---------
