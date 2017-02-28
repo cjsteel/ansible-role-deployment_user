@@ -1,12 +1,15 @@
+
 ansible-role-deployment_user
 ============================
 
 An Ansible role to setup a (system) deployment user and (system) deployment group.
 
+
 Under Development
 -----------------
 
 This role is under development and may change significantly.
+
 
 Requirements
 ------------
@@ -19,6 +22,8 @@ In order to connect, Ansible requires that ssh be installed
 
 ```shell
 sudo apt-get install openssh-server -y
+sudo ufw enable
+sudo ufw allow ssh
 ```
 #### users module
 
@@ -30,8 +35,23 @@ userdel
 usermod
 ```
 
+
 Setup
 -----
+
+### /etc/hosts
+
+```shell
+sudo nano /etc/hosts
+```
+
+#### Append example
+
+Append an entry to your Ansible controllers hosts file so the controller can find the system. Make sure to separate the IP address from the hostname using a tab.
+
+```txt
+192.168.11.22 workstation-001
+```
 
 ### Setup ssh agent
 
@@ -47,6 +67,13 @@ ssh <adminuser>@ace-ws-59
 exit
 ```
 
+#### Remove any stale keys
+
+```shell
+ssh-keygen -f "/home/ansible/.ssh/known_hosts" -R workstation-001
+ssh-keygen -f "/home/ansible/.ssh/known_hosts" -R 192.168.11.22
+```
+
 ### Setup ssh key
 
 ```shell
@@ -57,28 +84,7 @@ exit
 
 ```shell
 ssh <adminuser>@ace-ws-59
-
-Playbooks
----------
-
-### Main playbook
-
-Example of a minimal main playbook that contains an include for our roles' playbook:
-
-```yaml
----
-- hosts: all
-  become: false
-
-- include: deployment_user.yml
 ```
-
-Copy and edit included example if desired:
-
-    cp roles/deployment_user/files/systems.yml .
-    nano systems.yml
-
-### Roles' playbook
 
 ### group_vars/deployment_user/defaults.yml
 
@@ -86,7 +92,7 @@ Before creating our role's playbook we will set values for at least the followin
 
     deployment_user_username
     deployment_user_uid
-    
+
 and
 
     deployment_user_state
@@ -119,7 +125,29 @@ deployment_user_username : 'your_deployment_user'
 deployment_user_uid	     : '808'
 deployment_user_state    : 'present'
 ```
-### Role playbook
+## Playbooks
+
+```shell
+### Main playbook
+
+Example of a minimal main playbook that contains an include for our roles' playbook:
+
+​```yaml
+---
+- hosts: all
+  become: false
+
+- include: deployment_user.yml
+```
+
+Copy and edit included example if desired:
+
+```
+cp roles/deployment_user/files/systems.yml .
+nano systems.yml
+```
+
+### Roles' playbook
 
 Example of our roles' playbook
 
@@ -137,6 +165,7 @@ To copy and edit the included example:
 
     cp roles/deployment_user/files/deployment_user.yml .
     nano deployment_user.yml
+
 
 Other Variables
 ---------------
@@ -190,6 +219,7 @@ deployment_sudoers_d_files:
     mode  : 0440
 ```
 
+
 Inventory Examples
 ------------------
 
@@ -203,6 +233,7 @@ system-001 ansible_ssh_user=root
 system-002 ansible_ssh_user=root
 
 ```
+
 
 Ansible Command
 ---------------
@@ -225,11 +256,12 @@ CentOS or Ubuntu example using an initial ansible_ssh_user called `vagrant`
 db ansible_ssh_host=127.0.0.1 ansible_ssh_port=2222 ansible_ssh_private_key_file=/home/controller_user/projects/project_name/vms/.vagrant/machines/db/virtualbox/private_key ansible_ssh_user=vagrant
 ```
 
+
 Ansible Command
 ---------------
 Once you have entries for all your target hosts in your controllers known_hosts file you are ready to run your `ansible-playbook` command and create your deployment user.
 
-    ansible-playbook systems.yml -i inventory/development
+    ansible-playbook systems.yml -i inventory/dev --ask-become-pass
 
 ### Testing
 
@@ -238,6 +270,7 @@ To test your new deployment users connectivity you could use any of the followin
     ssh deployer@db -p 2222
     ssh deployer@127.0.0.1 -p 2222
     ssh deployer@localhost -p 2222
+
 
 Role Templates
 --------------
@@ -263,12 +296,13 @@ Add something like this to the dependencies section of the roles meta/main.yml f
       - { role: deployment_user, deployment_user_username: 'deploy', deployment_user_uid: '879', deployment_user_state : 'present' }
       - { role: deployment_user, deployment_user_username: 'ubuntu', deployment_user_state: 'absent' }
       - { role: deployment_user, deployment_user_username: 'vagrant', deployment_user_state: 'absent' }
- 
+
 
 Dependencies
 ------------
 
 Does not depend on any other to roles. See **Requirements** for target OS requirements for the Ansible **user** modules.
+
 
 Vagrant and SSH
 ---------------
@@ -282,7 +316,7 @@ From the vagrant vm directory run:
     vagrant ssh-config
 
 #### Output example
-  
+
     Host db
       HostName 127.0.0.1
       User vagrant
@@ -332,12 +366,27 @@ Now that the new deployment user has been setup for usage with the controllers p
     ssh deploy@127.0.0.1 -p 2222
     ssh deploy@127.0.0.1 -p 2200
 
+
 License
 -------
 
 GNU
 
+
 Author
 ------
 
 This role is a minimal interpretation of the Debops ansible-bootstrap role which can be found here > https://github.com/debops/ansible-bootstrap
+
+## Adaptated by
+
+Christopher Steel
+Systems Administrator
+McGill Centre for Integrative Neuroscience
+Montreal Neurological Institute
+McGill University
+3801 University Street
+Montréal, QC, Canada H3A 2B4
+Tel. No. +1 514 398-2494
+E-mail: christopherDOTsteel@mcgill.ca
+[MCIN](http://mcin-cnim.ca/), [theneuro.ca](http://theneuro.ca)
