@@ -1,0 +1,13 @@
+# roles/freesurfer/tests/vagrant.yml
+---
+- hosts: all
+  remote_user: vagrant
+  sudo: true
+  roles:
+    - ../../
+
+  vars:
+
+    - deployment_user_username    : 'deployment_user_name_goes_here'
+    - deployment_user_uid         : '1001'
+    - deployment_user_state       : 'present' # 'absent'
