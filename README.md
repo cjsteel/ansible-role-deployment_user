@@ -59,8 +59,6 @@ sudo ufw allow ssh
 
 Add the new workstations DHCP assigned IP address to `/etc/hosts` so our controller can find it.
 
-For new hosts without name services entries you can manually add the IP and corresponding domain name to the controllers `/etc/hosts` file:
-
 ```shell
 sudo nano /etc/hosts
 ```
@@ -100,7 +98,7 @@ ssh-keygen -f "/home/ansible/.ssh/known_hosts" -R 192.168.11.22
 ssh-copy-id <adminuser>@workstation-001
 exit
 ```
-### Confirm connectivity
+### Confirm
 
 ```shell
 ssh <adminuser>@workstation-001
@@ -108,14 +106,16 @@ ssh <adminuser>@workstation-001
 
 ### group_vars/deployment_user/defaults.yml
 
-Before creating our role's playbook we will set values for at least the following three vars in `group_vars/deployment_user/deployment_user_defaults.yml`:
+Before creating our role's playbook we will set values for at least the following three vars in `group_vars/deployment_user/defaults.yml`:
 
-* deployment_user_username
-* deployment_user_uid
-* deployment_user_state
+    deployment_user_username
+    deployment_user_uid
 
+and
 
-#### ensure for ggroup_vars/deployment_user directory
+    deployment_user_state
+
+#### Create group_vars directory
 
 First we create a directory to hold the group_vars related to our role.
 
@@ -125,7 +125,7 @@ First we create a directory to hold the group_vars related to our role.
 
     cp roles/deployment_user/files/group_vars/deployment_user/defaults.yml group_vars/deployment_user/.
 
-#### Edit group_vars/deployment_user/defaults.yml
+#### Edit and save
 
 Next we will edit the file and set our deployment users username, user id and the users state (present or absent).
 
@@ -134,21 +134,36 @@ Next we will edit the file and set our deployment users username, user id and th
 #### Minimal content example
 
 ```yaml
----
 # file: group_vars/deployment_user/defaults.yml
 #
-# Description:
-#
-# Used to overide role/deployment_user/defaults/main.yml vars.
-# This way our deployment user and the deployment users uid
-# does not get commited to roles' repository.
+# Used to overide role/deployment_user/defaults/main.yml vars
+# so that our deployment user is not commited to the roles repository.
 
-deployment_user_username    : 'deployment_user_name_goes_here'
-deployment_user_uid         : '1001'
-deployment_user_state       : 'present' # 'absent'
-
+deployment_user_username : 'your_deployment_user'
+deployment_user_uid	     : '808'
+deployment_user_state    : 'present'
 ```
 ## Playbooks
+
+```shell
+### Main playbook
+
+Example of a minimal main playbook that contains an include for our roles' playbook:
+
+​```yaml
+---
+- hosts: all
+  become: false
+
+- include: deployment_user.yml
+```
+
+Copy and edit included example if desired:
+
+```
+cp roles/deployment_user/files/systems.yml .
+nano systems.yml
+```
 
 ### Roles' playbook
 
@@ -161,43 +176,21 @@ Example of our roles' playbook
   become: true
   gather_facts: true
   roles:
-  - deployment_user
+    - deployment_user
 ```
 
 To copy and edit the included example:
 
-```
-cp roles/deployment_user/files/deployment_user.yml .
-nano deployment_user.yml
-```
-
-### Main playbook
-
-Example of a minimal main playbook that contains an include for our roles' playbook can be copied like this:
-
-```shell
-cp roles/deployment_user/files/systems.yml .
-```
-
-systems.yml main playbook content example:
+    cp roles/deployment_user/files/deployment_user.yml .
+    nano deployment_user.yml
 
 
-```yaml
----
-- hosts: all
-  become: false
-
-- include: deployment_user.yml
-```
-
-
-Role Variables
+Other Variables
 ---------------
 
 ### defaults/main.yml example
 
 All of our variables are located in `defaults/main.yml` so that they can be overidden via precidence via `group_vars` and/or `host_vars` as is the case for the first three.
-
 
 ```yaml
 ---
@@ -244,6 +237,7 @@ deployment_sudoers_d_files:
     mode  : 0440
 ```
 
+
 Inventory Examples
 ------------------
 
@@ -255,6 +249,7 @@ CentOS production example
 [deployment_user]
 system-001 ansible_ssh_user=root
 system-002 ansible_ssh_user=root
+
 ```
 
 
@@ -268,9 +263,7 @@ Connectivity Test
 
 Now you should be able to ssh in using your new deployment user with your ssh keypair for authentication.
 
-```shell
-ssh deployment_user@host
-```
+    ssh deployment_user@host
 
 ### Development
 
@@ -281,7 +274,8 @@ CentOS or Ubuntu example using an initial ansible_ssh_user called `vagrant`
 db ansible_ssh_host=127.0.0.1 ansible_ssh_port=2222 ansible_ssh_private_key_file=/home/controller_user/projects/project_name/vms/.vagrant/machines/db/virtualbox/private_key ansible_ssh_user=vagrant
 ```
 
-ansible-playbook  command example
+
+Ansible Command
 ---------------
 Once you have entries for all your target hosts in your controllers known_hosts file you are ready to run your `ansible-playbook` command and create your deployment user.
 
