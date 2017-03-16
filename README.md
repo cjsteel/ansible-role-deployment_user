@@ -14,17 +14,15 @@ This role is under development and may change significantly.
 Requirements
 ------------
 
-### Ansible
+### install OS on target system
 
-#### ssh
+* backup any data
+* unplug network cable
+* disable secureboot
+* include third party drivers
+* format entire disk
+* create an admin user with a good password
 
-In order to connect, Ansible requires that ssh be installed
-
-```shell
-sudo apt-get install openssh-server -y
-sudo ufw enable
-sudo ufw allow ssh
-```
 #### users module
 
 The Ansible user module requires the following on the target OS to support the Ansible **user** module:
@@ -35,17 +33,37 @@ userdel
 usermod
 ```
 
+####  setup firewall on target system(s)
 
-Setup
------
+network cable still unplugged
 
-### /etc/hosts
+```shell
+sudo ufw enable
+sudo ufw allow ssh
+```
+
+#### install openssh-server
+
+* Plug in network cable
+* install opesh-server so that the Ansible controller can connect to the system:
+
+```shell
+sudo apt-get update
+sudo apt-get install openssh-server -y
+sudo ufw enable
+sudo ufw allow ssh
+```
+### Ansible controller configuration
+
+#### /etc/hosts
+
+Add the new workstations DHCP assigned IP address to `/etc/hosts` so our controller can find it.
 
 ```shell
 sudo nano /etc/hosts
 ```
 
-#### Append example
+#####  Append example
 
 Append an entry to your Ansible controllers hosts file so the controller can find the system. Make sure to separate the IP address from the hostname using a tab.
 
@@ -63,7 +81,7 @@ eval `ssh-agent -s`
 ### Confirm connectivity
 
 ```shell
-ssh <adminuser>@ace-ws-59
+ssh <adminuser>@workstation-001
 exit
 ```
 
@@ -77,13 +95,13 @@ ssh-keygen -f "/home/ansible/.ssh/known_hosts" -R 192.168.11.22
 ### Setup ssh key
 
 ```shell
-ssh-copy-id <adminuser>@ace-ws-59
+ssh-copy-id <adminuser>@workstation-001
 exit
 ```
 ### Confirm
 
 ```shell
-ssh <adminuser>@ace-ws-59
+ssh <adminuser>@workstation-001
 ```
 
 ### group_vars/deployment_user/defaults.yml
@@ -261,7 +279,7 @@ Ansible Command
 ---------------
 Once you have entries for all your target hosts in your controllers known_hosts file you are ready to run your `ansible-playbook` command and create your deployment user.
 
-    ansible-playbook systems.yml -i inventory/dev --ask-become-pass
+    ansible-playbook systems.yml -i inventory/dev --ask-become-pass --limit workstation-001
 
 ### Testing
 
