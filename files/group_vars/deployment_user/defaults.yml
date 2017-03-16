@@ -9,10 +9,4 @@
 
 deployment_user_username    : 'deployment_user_name_goes_here'
 deployment_user_uid         : '1001' 
-deployment_user_state       : 'present'
-
-# to remove
-
-#deployment_user_username        : 'deploy'
-#deployment_user_uid                 : '878'
-#deployment_user_state           : 'absent'
+deployment_user_state       : 'present' # 'absent'
