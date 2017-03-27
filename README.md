@@ -2,26 +2,39 @@
 ansible-role-deployment_user
 ============================
 
-An Ansible role to setup a (system) deployment user and (system) deployment group.
+An Ansible role to setup a (system) deployment user and (system) deployment group on targeted systems.
 
+## Description
+
+The **deployment_user** Ansible role prepares nodes for usage with Ansible by setting up a deployment user as well as a public key for the Ansible controller in order to allow the controller to connect to the remote system using SSH keypairs. You may want to consider using a passphrase protected keypair with a strong pass phrase loaded to memory using ssh-agent and the ssh-agent or ssh-add -t (life) option.
+
+    -t life
+      Set a default value for the maximum lifetime of identities added to the agent.  The lifetime
+      may be specified in seconds or in a time format specified in sshd_config(5).  A lifetime
+      specified for an identity with ssh-add(1) overrides this value.  Without this option the
+      default maximum lifetime is forever.
 
 Under Development
 -----------------
 
-This role is under development and may change significantly.
+This role is considered to be stable.
+
+## Target system preparations
+
+The deployment_user role Before applying this role 
+
+- Backup any data.
+- Disconnect from network.
+- Secure boot considerations
+  - Third party drivers / signing?
+- FFR (FDISK, Format, Reload OS)
+- Create an administrative user with a good password
+
+#### 
 
 
 Requirements
 ------------
-
-### install OS on target system
-
-* backup any data
-* unplug network cable
-* disable secureboot
-* include third party drivers
-* format entire disk
-* create an admin user with a good password
 
 #### users module
 
@@ -255,6 +268,14 @@ system-002 ansible_ssh_user=root
 
 Ansible Command
 ---------------
+
+
+
+```shell
+ansible-playbook systems.yml -i inventory/dev --ask-become-pass --limit workstation-001
+```
+
+
 
     ansible-playbook systems.yml -i inventory/development --ask-become-pass
 
