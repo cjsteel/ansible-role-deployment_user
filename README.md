@@ -14,6 +14,7 @@ The **deployment_user** Ansible role prepares nodes for usage with Ansible by se
       specified for an identity with ssh-add(1) overrides this value.  Without this option the
       default maximum lifetime is forever.
 
+
 Under Development
 -----------------
 
@@ -274,8 +275,6 @@ Ansible Command
 ```shell
 ansible-playbook systems.yml -i inventory/dev --ask-become-pass --limit workstation-001
 ```
-
-
 
     ansible-playbook systems.yml -i inventory/development --ask-become-pass
 
