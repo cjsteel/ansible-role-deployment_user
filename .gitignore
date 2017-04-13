@@ -4,7 +4,8 @@
 # private files
 .private
 .prv
-.retry
+*.retry
 .vault
+vault
 .vagrant
 *.log
