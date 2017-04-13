@@ -1,0 +1,17 @@
+cat ~/.config/gnome-control-center/backgrounds/last-edited.xml 
+
+
+
+
+<?xml version="1.0"?>
+<!DOCTYPE wallpapers SYSTEM "gnome-wp-list.dtd">
+<wallpapers>
+  <wallpaper>
+    <name>Road</name>
+    <filename>/usr/share/backgrounds/gnome/m104_01_2560x1600.jpg</filename>
+    <options>zoom</options>
+    <pcolor>#ffffff</pcolor>
+    <scolor>#000000</scolor>
+  </wallpaper>
+</wallpapers>
+

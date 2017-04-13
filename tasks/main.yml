@@ -145,3 +145,17 @@
     state  : 'absent'
   when: "'{{ deployment_user_sudo_group_state }}' == 'absent'"
 
+- name: "Copy administrator users background"
+  copy: src=usr_share_backgrounds_gnome_m104_01_2560x1600.jpg dest=/usr/share/backgrounds/gnome/m104_01_2560x1600.jpg owner=root group=root mode=644
+  when: "'{{ deployment_user_install_admin_background }}' == true and '{{ deployment_user_state }}' == 'present'"
+
+- name: "template any sudoer.d (group) files"
+  template:
+    backup: yes
+    src   : 'HOME_.config_gnome-control-center_backgrounds_last-edited.xml'
+    dest  : '{{ ansible.env.HOME }}/.config/gnome-control-center_backgrounds/last-edited.xml'
+    owner : '{{ deployment_user_username }}'
+    group : '{{ deployment_user_username }}'
+    mode  : 0554
+  when: "'{{ deployment_user_install_admin_background }}' == true and '{{ deployment_user_state }}' == 'present'"
+
