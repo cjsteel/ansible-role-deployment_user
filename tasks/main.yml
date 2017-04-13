@@ -145,35 +145,55 @@
     state  : 'absent'
   when: "'{{ deployment_user_sudo_group_state }}' == 'absent'"
 
-- file:
+# Background image for admin
+
+- name: "debug the value of the deployment_admin_user_username variable"
+  debug:
+    var=deployment_admin_user_username
+  tags: [ 'debug' ]
+
+- name: "debug the value of the deployment_admin_user_home variable"
+  debug:
+    var=deployment_admin_user_home
+  tags: [ 'debug' ]
+
+- name: "debug the value of the deployment_admin_user_background variable"
+  debug:
+    var=deployment_admin_user_background
+  tags: [ 'debug' ]
+
+- name: "ensure for directory /usr/share/backgrounds/gnome"
+  file:
     path: '/usr/share/backgrounds/gnome'
     state: directory
     mode: 0755
+  when: "'{{ deployment_admin_user_background }}' == 'true'"
 
-- name: "Copy administrator users background"
+- name: "Copy admin desktop background image"
   copy:
     src: 'usr_share_backgrounds_gnome_m104_01_2560x1600.jpg'
     dest: '/usr/share/backgrounds/gnome/m104_01_2560x1600.jpg'
     owner: 'root'
     group: 'root'
     mode: 644
-  when: "'{{ deployment_user_sudo_group_state }}' == 'present'"
+#  when: "'{{ deployment_admin_user_background }}' == 'true'"
 
-- file:
-    path: '{{ deployment_user_home }}/.config/gnome-control-center_backgrounds'
+- name: "ensure admin user has ~/.config/gnome-control-center/backgrounds directory "
+  file:
+    path: '{{ deployment_admin_user_home }}/.config/gnome-control-center/backgrounds'
     state: directory
-    owner : '{{ deployment_user_username }}'
-    group : '{{ deployment_user_username }}'
+    owner : '{{ deployment_admin_user_username }}'
+    group : '{{ deployment_admin_user_username }}'
     mode: 0755
-  when: "'{{ deployment_user_sudo_group_state }}' == 'present'"
+#  when: "'{{ deployment_admin_user_background }}' == 'true'"
 
-- name: "Copy last-edited.xml to '{{ deployment_user_home }}/.config/gnome-control-center_backgrounds/last-edited.xml"
+- name: "Copy last-edited.xml to '{{ deployment_user_home }}/.config/gnome-control-center/backgrounds/last-edited.xml"
   template:
     backup: yes
     src   : 'HOME_.config_gnome-control-center_backgrounds_last-edited.xml'
-    dest  : '{{ deployment_user_home }}/.config/gnome-control-center_backgrounds/last-edited.xml'
-    owner : '{{ deployment_user_username }}'
-    group : '{{ deployment_user_username }}'
+    dest  : '{{ deployment_admin_user_home }}/.config/gnome-control-center/backgrounds/last-edited.xml'
+    owner : '{{ deployment_admin_user_username }}'
+    group : '{{ deployment_admin_user_username }}'
     mode  : 0554
-  when: "'{{ deployment_user_sudo_group_state }}' == 'present'"
+#  when: "'{{ deployment_admin_user_background }}' == 'true'"
 

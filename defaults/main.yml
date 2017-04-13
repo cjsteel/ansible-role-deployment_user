@@ -11,7 +11,9 @@ deployment_user_home            : '/home/{{ deployment_user_username }}'
 deployment_user_uid	            : '878'
 deployment_user_state           : 'present'
 
-deployment_user_install_admin_background : true
+deployment_admin_user_username   : 'admin'
+deployment_admin_user_home       : '/home/{{ deployment_admin_user_username }}'
+deployment_admin_user_background : true
 
 deployment_user_system_groups       : [ "{{ deployment_user_username }}" ]
 # this probably shoud be skipped for now
