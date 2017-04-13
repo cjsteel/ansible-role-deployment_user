@@ -10,7 +10,7 @@ deployment_user_username        : 'deploy'
 deployment_user_uid	            : '878'
 deployment_user_state           : 'absent'
 
-deployment_user_install_admin_background     : true
+deployment_user_install_admin_background : true
 
 deployment_user_system_groups       : [ "{{ deployment_user_username }}" ]
 # this probably shoud be skipped for now

@@ -6,3 +6,5 @@
 .prv
 .retry
 .vault
+.vagrant
+*.log
