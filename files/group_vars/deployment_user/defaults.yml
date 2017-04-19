@@ -1,15 +1,15 @@
 ---
-# file: group_vars/deployment-user/defaults.yml   
+# file: group_vars/deployment_user/defaults.yml   
 #
 # Description:
 #
-# Used to overide role/deployment-user/defaults/main.yml vars.
+# Used to overide role/deployment_user/defaults/main.yml vars.
 # This way our deployment user and the deployment users uid 
 # does not get commited to roles' repository.
 
-deployment-user_username    : 'deployment-user_name_goes_here'
-deployment-user_uid         : '1001' 
-deployment-user_state       : 'present' # 'absent'
+deployment_user_username    : 'deployment_user_name_goes_here'
+deployment_user_uid         : '1001' 
+deployment_user_state       : 'present' # 'absent'
 
 deployment_admin_user_username   : 'admin_user_name_goes_here'
 deployment_admin_user_home       : '/home/{{ deployment_admin_user_username }}'

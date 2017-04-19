@@ -18,17 +18,10 @@ boxes = [
 #    :cpu => "50",
 #    :ram => "256"
 #  },
-#  {
-#    :name => "ubuntu-1604",
-#    :box => "ubuntu/xenial64",
-#    :ip => '10.0.0.13',
-#    :cpu => "50",
-#    :ram => "256"
-#  },
   {
-    :name => "centos-7",
-    :box => "centos/7",
-    :ip => '10.0.0.17',
+    :name => "ubuntu-1604",
+    :box => "ubuntu/xenial64",
+    :ip => '10.0.0.13',
     :cpu => "50",
     :ram => "256"
   },
