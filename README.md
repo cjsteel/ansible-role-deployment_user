@@ -1,12 +1,12 @@
 
-ansible-role-deployment_user
+ansible-role-deployment-user
 ============================
 
 An Ansible role to setup a (system) deployment user and (system) deployment group on targeted systems.
 
 ## Description
 
-The **deployment_user** Ansible role prepares nodes for usage with Ansible by setting up a deployment user as well as a public key for the Ansible controller in order to allow the controller to connect to the remote system using SSH keypairs. You may want to consider using a passphrase protected keypair with a strong pass phrase loaded to memory using ssh-agent and the ssh-agent or ssh-add -t (life) option.
+The **deployment-user** Ansible role prepares nodes for usage with Ansible by setting up a deployment user as well as a public key for the Ansible controller in order to allow the controller to connect to the remote system using SSH keypairs. You may want to consider using a passphrase protected keypair with a strong pass phrase loaded to memory using ssh-agent and the ssh-agent or ssh-add -t (life) option.
 
     -t life
       Set a default value for the maximum lifetime of identities added to the agent.  The lifetime
@@ -22,7 +22,7 @@ This role is considered to be stable.
 
 ## Target system preparations
 
-The deployment_user role Before applying this role 
+The deployment-user role Before applying this role 
 
 - Backup any data.
 - Disconnect from network.
@@ -118,44 +118,44 @@ exit
 ssh <adminuser>@workstation-001
 ```
 
-### group_vars/deployment_user/defaults.yml
+### group_vars/deployment-user/defaults.yml
 
-Before creating our role's playbook we will set values for at least the following three vars in `group_vars/deployment_user/defaults.yml`:
+Before creating our role's playbook we will set values for at least the following three vars in `group_vars/deployment-user/defaults.yml`:
 
-    deployment_user_username
-    deployment_user_uid
+    deployment-user_username
+    deployment-user_uid
 
 and
 
-    deployment_user_state
+    deployment-user_state
 
 #### Create group_vars directory
 
 First we create a directory to hold the group_vars related to our role.
 
-    mkdir -p group_vars/deployment_user
+    mkdir -p group_vars/deployment-user
 
 #### Copy the example file.
 
-    cp roles/deployment_user/files/group_vars/deployment_user/defaults.yml group_vars/deployment_user/.
+    cp roles/deployment-user/files/group_vars/deployment-user/defaults.yml group_vars/deployment-user/.
 
 #### Edit and save
 
 Next we will edit the file and set our deployment users username, user id and the users state (present or absent).
 
-    nano group_vars/deployment_user/defaults.yml
+    nano group_vars/deployment-user/defaults.yml
 
 #### Minimal content example
 
 ```yaml
-# file: group_vars/deployment_user/defaults.yml
+# file: group_vars/deployment-user/defaults.yml
 #
-# Used to overide role/deployment_user/defaults/main.yml vars
+# Used to overide role/deployment-user/defaults/main.yml vars
 # so that our deployment user is not commited to the roles repository.
 
-deployment_user_username : 'your_deployment_user'
-deployment_user_uid	     : '808'
-deployment_user_state    : 'present'
+deployment-user_username : 'your_deployment-user'
+deployment-user_uid	     : '808'
+deployment-user_state    : 'present'
 ```
 ## Playbooks
 
@@ -169,13 +169,13 @@ Example of a minimal main playbook that contains an include for our roles' playb
 - hosts: all
   become: false
 
-- include: deployment_user.yml
+- include: deployment-user.yml
 ```
 
 Copy and edit included example if desired:
 
 ```
-cp roles/deployment_user/files/systems.yml .
+cp roles/deployment-user/files/systems.yml .
 nano systems.yml
 ```
 
@@ -185,18 +185,18 @@ Example of our roles' playbook
 
 ```yaml
 ---
-- hosts: deployment_user
-  user: '{{ deployment_user_username }}'
+- hosts: deployment-user
+  user: '{{ deployment-user_username }}'
   become: true
   gather_facts: true
   roles:
-    - deployment_user
+    - deployment-user
 ```
 
 To copy and edit the included example:
 
-    cp roles/deployment_user/files/deployment_user.yml .
-    nano deployment_user.yml
+    cp roles/deployment-user/files/deployment-user.yml .
+    nano deployment-user.yml
 
 
 Other Variables
@@ -212,40 +212,40 @@ All of our variables are located in `defaults/main.yml` so that they can be over
 #
 #
 # three vars most people will change.
-# overidden via group_vars/deployment_user/defaults.yml
+# overidden via group_vars/deployment-user/defaults.yml
 
-deployment_user_username : 'deployer'
-deployment_user_uid      : '808'
-deployment_user_state    : 'absent'
+deployment-user_username : 'deployer'
+deployment-user_uid      : '808'
+deployment-user_state    : 'absent'
 
-deployment_user_system_groups       : [ "{{ deployment_user_username }}" ]
+deployment-user_system_groups       : [ "{{ deployment-user_username }}" ]
 
 # perhaps implement later if required
-deployment_user_system_groups_state : '{{ deployment_user_state }}'
+deployment-user_system_groups_state : '{{ deployment-user_state }}'
 
-deployment_user_home_gid            : '{{ deployment_user_uid }}'
-deployment_user_home_group          : '{{ deployment_user_system_groups[0] }}'
+deployment-user_home_gid            : '{{ deployment-user_uid }}'
+deployment-user_home_group          : '{{ deployment-user_system_groups[0] }}'
 
-deployment_user_sudo_group          : '{{ deployment_user_username }}'
-deployment_user_sudo_group_state    : '{{ deployment_user_state }}'
+deployment-user_sudo_group          : '{{ deployment-user_username }}'
+deployment-user_sudo_group_state    : '{{ deployment-user_state }}'
 
 # !!! DANGER in most cases home directories should only be removed after archiving!!!
-deployment_user_home                : '{{ "/home/" + deployment_user_username }}'
-deployment_user_home_mode           : '0750'
-# deployment_user_home_state        : 'absent' # not implemented
+deployment-user_home                : '{{ "/home/" + deployment-user_username }}'
+deployment-user_home_mode           : '0750'
+# deployment-user_home_state        : 'absent' # not implemented
 
-deployment_user_shell           : '/bin/bash'
-deployment_user_comment         : 'Ansible deployment user'
+deployment-user_shell           : '/bin/bash'
+deployment-user_comment         : 'Ansible deployment user'
 
-deployment_users_public_sshkeys       : [ '{{ lookup("pipe","ssh-add -L | grep ^ssh || cat ~/.ssh/id_rsa.pub || true") }}' ]
-deployment_users_public_sshkeys_state : '{{ deployment_user_state }}'
+deployment-users_public_sshkeys       : [ '{{ lookup("pipe","ssh-add -L | grep ^ssh || cat ~/.ssh/id_rsa.pub || true") }}' ]
+deployment-users_public_sshkeys_state : '{{ deployment-user_state }}'
 
 deployment_sudoers_d_files:
 
   etc_sudoers.d:
 
     src   : 'etc/sudoers.d/sudoers_group.j2'
-    dest  : '/etc/sudoers.d/{{ deployment_user_sudo_group }}'
+    dest  : '/etc/sudoers.d/{{ deployment-user_sudo_group }}'
     owner : root
     group : root
     mode  : 0440
@@ -260,7 +260,7 @@ Inventory Examples
 CentOS production example
 
 ```yaml
-[deployment_user]
+[deployment-user]
 system-001 ansible_ssh_user=root
 system-002 ansible_ssh_user=root
 
@@ -283,14 +283,14 @@ Connectivity Test
 
 Now you should be able to ssh in using your new deployment user with your ssh keypair for authentication.
 
-    ssh deployment_user@host
+    ssh deployment-user@host
 
 ### Development
 
 CentOS or Ubuntu example using an initial ansible_ssh_user called `vagrant`
 
 ```yaml
-[deployment_user]
+[deployment-user]
 db ansible_ssh_host=127.0.0.1 ansible_ssh_port=2222 ansible_ssh_private_key_file=/home/controller_user/projects/project_name/vms/.vagrant/machines/db/virtualbox/private_key ansible_ssh_user=vagrant
 ```
 
@@ -313,7 +313,7 @@ To test your new deployment users connectivity you could use any of the followin
 Role Templates
 --------------
 
-`roles/deployment_user/templates` currently has the following templates:
+`roles/deployment-user/templates` currently has the following templates:
 
     Ubuntu/12.04/etc/sudoers.d/sudoers_group.j2
     Ubuntu/14.04/etc/sudoers.d/sudoers_group.j2
@@ -325,15 +325,15 @@ Role Templates
 
 You could probably use this role as a dependency, I have not tried this yet.
 
-##### deployment_user/meta.yml
+##### deployment-user/meta.yml
 
 Add something like this to the dependencies section of the roles meta/main.yml file. I usually move dependencies section to the top of the file so that it is readily noticable.
 
     dependencies:
 
-      - { role: deployment_user, deployment_user_username: 'deploy', deployment_user_uid: '879', deployment_user_state : 'present' }
-      - { role: deployment_user, deployment_user_username: 'ubuntu', deployment_user_state: 'absent' }
-      - { role: deployment_user, deployment_user_username: 'vagrant', deployment_user_state: 'absent' }
+      - { role: deployment-user, deployment-user_username: 'deploy', deployment-user_uid: '879', deployment-user_state : 'present' }
+      - { role: deployment-user, deployment-user_username: 'ubuntu', deployment-user_state: 'absent' }
+      - { role: deployment-user, deployment-user_username: 'vagrant', deployment-user_state: 'absent' }
 
 
 Dependencies
@@ -391,11 +391,11 @@ If your have created a new VM you may need to remove stale host keys from the co
 We specify our host, ssh port, private key location and our ansible ssh user when testing using Vagrant.
 
 ```yaml
-[deployment_user]
+[deployment-user]
 db ansible_ssh_host=127.0.0.1 ansible_ssh_port=2222 ansible_ssh_private_key_file=/home/controller_user/projects/project_name/vms/.vagrant/machines/db/virtualbox/private_key ansible_ssh_user=vagrant
 ```
 
-### Run the deployment_user role
+### Run the deployment-user role
 
 ### confirm your new deployment user
 

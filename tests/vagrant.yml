@@ -7,10 +7,10 @@
 
   vars:
 
-    - deployment_user_username                 : 'deploy'
-    - deployment_user_home                     : '/home/{{ deployment_user_username }}'
-    - deployment_user_uid                      : '1001'
-    - deployment_user_state                    : 'present'
+    - deployment-user_username                 : 'deploy'
+    - deployment-user_home                     : '/home/{{ deployment-user_username }}'
+    - deployment-user_uid                      : '1001'
+    - deployment-user_state                    : 'present'
 
     - deployment_admin_user_username   : 'admin_user_name_goes_here'
     - deployment_admin_user_home       : '/home/{{ deployment_admin_user_username }}'

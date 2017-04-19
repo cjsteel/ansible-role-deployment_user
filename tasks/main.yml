@@ -12,56 +12,56 @@
 
 - name: "Remove our deployment user when state is absent"
   user:
-    name: '{{ deployment_user_username }}'
-    uid      : '{{ deployment_user_uid }}'
+    name: '{{ deployment-user_username }}'
+    uid      : '{{ deployment-user_uid }}'
     state    : 'absent'
     system   : True
-    group    : '{{ deployment_user_home_group }}'
-    groups   : '{{ deployment_user_system_groups | join(",") }}'
+    group    : '{{ deployment-user_home_group }}'
+    groups   : '{{ deployment-user_system_groups | join(",") }}'
     append   : True
-    home     : '{{ deployment_user_home }}'
-    shell    : '{{ deployment_user_shell }}'
-    comment  : '{{ deployment_user_comment }}'
-  when: "'{{ deployment_user_state }}' == 'absent'"
+    home     : '{{ deployment-user_home }}'
+    shell    : '{{ deployment-user_shell }}'
+    comment  : '{{ deployment-user_comment }}'
+  when: "'{{ deployment-user_state }}' == 'absent'"
 
 - name: "Ensure deployment user account user is removed from the deployment users passwordless sudo group"
   user:
-    name   : '{{ deployment_user_username }}'
+    name   : '{{ deployment-user_username }}'
     state  : 'absent'
-    groups : '{{ deployment_user_sudo_group }}'
+    groups : '{{ deployment-user_sudo_group }}'
     append : True
-  when: "'{{ deployment_user_sudo_group_state }}' == 'present'"
+  when: "'{{ deployment-user_sudo_group_state }}' == 'present'"
 
 - name: Ensure specified system group(s) are present or absent.
   group:
     name  : '{{ item }}'
-    gid   : '{{ deployment_user_home_gid }}'
-    state : '{{ deployment_user_system_groups_state }}'
+    gid   : '{{ deployment-user_home_gid }}'
+    state : '{{ deployment-user_system_groups_state }}'
     system: True
-  with_items: '{{ deployment_user_system_groups }}'
-#  when: "'{{ deployment_user_state }}' == 'present'"
+  with_items: '{{ deployment-user_system_groups }}'
+#  when: "'{{ deployment-user_state }}' == 'present'"
 
 - name: "ensure that our deployment user exists and is a system account"
   user:
-    name: '{{ deployment_user_username }}'
-    uid      : '{{ deployment_user_uid }}'
-    state    : '{{ deployment_user_state }}'
+    name: '{{ deployment-user_username }}'
+    uid      : '{{ deployment-user_uid }}'
+    state    : '{{ deployment-user_state }}'
     system   : True
-    group    : '{{ deployment_user_home_group }}'
-    groups   : '{{ deployment_user_system_groups | join(",") }}'
+    group    : '{{ deployment-user_home_group }}'
+    groups   : '{{ deployment-user_system_groups | join(",") }}'
     append   : True
-    home     : '{{ deployment_user_home }}'
-    shell    : '{{ deployment_user_shell }}'
-    comment  : '{{ deployment_user_comment }}'
-  when: "'{{ deployment_user_state }}' == 'present'"
+    home     : '{{ deployment-user_home }}'
+    shell    : '{{ deployment-user_shell }}'
+    comment  : '{{ deployment-user_comment }}'
+  when: "'{{ deployment-user_state }}' == 'present'"
 
 - name: "Add or remove the deployment users public sshkey(s) to the remote users authorized_keys file."
   authorized_key:
-    user  : '{{ deployment_user_username }}'
-    key   : '{{ "\n".join(deployment_users_public_sshkeys) | string }}'
-    state : '{{ deployment_users_public_sshkeys_state }}'
-  failed_when: (deployment_users_public_sshkeys is undefined or
-                (deployment_users_public_sshkeys is defined and not deployment_users_public_sshkeys))
+    user  : '{{ deployment-user_username }}'
+    key   : '{{ "\n".join(deployment-users_public_sshkeys) | string }}'
+    state : '{{ deployment-users_public_sshkeys_state }}'
+  failed_when: (deployment-users_public_sshkeys is undefined or
+                (deployment-users_public_sshkeys is defined and not deployment-users_public_sshkeys))
 
 # template our sudo users sudoers.d file and give ansible managed header
 
@@ -70,7 +70,7 @@
     path  : '{{ item.value.dest }}'
     state : 'absent'
   with_dict: "{{ deployment_sudoers_d_files }}"
-  when: "'{{ deployment_user_state }}' == 'absent'"
+  when: "'{{ deployment-user_state }}' == 'absent'"
 
 - name: "template any sudoer.d (group) files"
   template:
@@ -81,7 +81,7 @@
     group : '{{ item.value.group }}'
     mode  : '{{ item.value.mode }}'
   with_dict: "{{ deployment_sudoers_d_files }}"
-  when: "'{{ deployment_user_state }}' == 'present' and '{{ ansible_distribution }}' == 'CentOS'"
+  when: "'{{ deployment-user_state }}' == 'present' and '{{ ansible_distribution }}' == 'CentOS'"
 
 - name: "template any sudoer.d (group) files"
   template:
@@ -92,20 +92,20 @@
     group : '{{ item.value.group }}'
     mode  : 0440
   with_dict: "{{ deployment_sudoers_d_files }}"
-  when: "'{{ deployment_user_state }}' == 'present' and '{{ ansible_distribution }}' == 'Ubuntu'"
+  when: "'{{ deployment-user_state }}' == 'present' and '{{ ansible_distribution }}' == 'Ubuntu'"
 
 - name: Create (or remove ) specified system groups
   group:
     name  : '{{ item }}'
-    gid   : '{{ deployment_user_home_gid }}'
-    state : '{{ deployment_user_system_groups_state }}'
+    gid   : '{{ deployment-user_home_gid }}'
+    state : '{{ deployment-user_system_groups_state }}'
     system: True
-  with_items: '{{ deployment_user_system_groups }}'
-#  when: "'{{ deployment_user_system_groups_state }}' == 'present'"
+  with_items: '{{ deployment-user_system_groups }}'
+#  when: "'{{ deployment-user_system_groups_state }}' == 'present'"
 
 - name: "Configure deployment users system group with passwordless access for sudo"
   lineinfile:
-    dest     : '/etc/sudoers.d/{{ deployment_user_sudo_group }}'
+    dest     : '/etc/sudoers.d/{{ deployment-user_sudo_group }}'
     regexp   : '{{ item.regexp }}'
     line     : '{{ item.line }}'
     state    : 'present'
@@ -115,11 +115,11 @@
     mode     : '0440'
     validate : 'visudo -cf %s'
   with_items:
-    - regexp: '^Defaults: %{{ deployment_user_sudo_group }} env_check\s'
-      line:    'Defaults: %{{ deployment_user_sudo_group }} env_check += "SSH_CLIENT"'
-    - regexp: '^%{{ deployment_user_sudo_group }}\s'
-      line:    '%{{ deployment_user_sudo_group }} ALL = (ALL:ALL) NOPASSWD: SETENV: ALL'
-  when: "'{{ deployment_user_sudo_group_state }}' == 'present'"
+    - regexp: '^Defaults: %{{ deployment-user_sudo_group }} env_check\s'
+      line:    'Defaults: %{{ deployment-user_sudo_group }} env_check += "SSH_CLIENT"'
+    - regexp: '^%{{ deployment-user_sudo_group }}\s'
+      line:    '%{{ deployment-user_sudo_group }} ALL = (ALL:ALL) NOPASSWD: SETENV: ALL'
+  when: "'{{ deployment-user_sudo_group_state }}' == 'present'"
 
 
 - name: "Ensure /etc/sudoers includes /etc/sudoers.d"
@@ -129,21 +129,21 @@
     line     : '#includedir /etc/sudoers.d'
     state    : 'present'
     validate : 'visudo -cf %s'
-  when: "'{{ deployment_user_sudo_group_state }}' == 'present'"
+  when: "'{{ deployment-user_sudo_group_state }}' == 'present'"
 
 - name: "Ensure that our deployment account user is in our deployment users passwordless sudo group"
   user:
-    name   : '{{ deployment_user_username }}'
+    name   : '{{ deployment-user_username }}'
     state  : 'present'
-    groups : '{{ deployment_user_sudo_group }}'
+    groups : '{{ deployment-user_sudo_group }}'
     append : True
-  when: "'{{ deployment_user_sudo_group_state }}' == 'present'"
+  when: "'{{ deployment-user_sudo_group_state }}' == 'present'"
   
 - name: "Delete sudoers.d group file when state is set to absent"
   file:
-    path   : '/etc/sudoers.d/{{ deployment_user_sudo_group }}'
+    path   : '/etc/sudoers.d/{{ deployment-user_sudo_group }}'
     state  : 'absent'
-  when: "'{{ deployment_user_sudo_group_state }}' == 'absent'"
+  when: "'{{ deployment-user_sudo_group_state }}' == 'absent'"
 
 # Background image for admin
 
@@ -187,7 +187,7 @@
     mode: 0755
 #  when: "'{{ deployment_admin_user_background }}' == 'true'"
 
-- name: "Copy last-edited.xml to '{{ deployment_user_home }}/.config/gnome-control-center/backgrounds/last-edited.xml"
+- name: "Copy last-edited.xml to '{{ deployment-user_home }}/.config/gnome-control-center/backgrounds/last-edited.xml"
   template:
     backup: yes
     src   : 'HOME_.config_gnome-control-center_backgrounds_last-edited.xml'

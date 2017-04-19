@@ -1,8 +1,8 @@
 ---
-- hosts: deployment_user
-  user: '{{ deployment_user_username }}'
+- hosts: deployment-user
+  user: '{{ deployment-user_username }}'
   become: true
   gather_facts: true
   roles:
-    - deployment_user
+    - deployment-user
 
