@@ -97,8 +97,8 @@ eval `/usr/bin/ssh-agent -s`
 #### remove any stale keys
 
 ```shell
-ssh-keygen -f "/home/ansible/.ssh/known_hosts" -R workstation-001
-ssh-keygen -f "/home/ansible/.ssh/known_hosts" -R 192.168.11.22
+ssh-keygen -f "$HOME/.ssh/known_hosts" -R workstation-001
+ssh-keygen -f "$HOME/.ssh/known_hosts" -R 192.168.11.22
 ```
 
 #### test connection
@@ -111,7 +111,7 @@ exit
 #### copy over ssh public key
 
 ```shell
-
+$
 ssh-copy-id <adminuser>@workstation-001
 exit
 ```
