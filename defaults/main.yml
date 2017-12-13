@@ -8,7 +8,7 @@
 
 deployment_user_username        : 'deploy'
 deployment_user_home            : '/home/{{ deployment_user_username }}'
-deployment_user_uid	            : '878'
+deployment_user_uid             : 878
 deployment_user_state           : 'present'
 
 deployment_admin_user_username   : 'admin'
