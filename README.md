@@ -88,30 +88,35 @@ Append an entry to your Ansible controllers hosts file so the controller can fin
 ### Setup ssh agent
 
 ```shell
-eval `ssh-agent -s`
+eval `/usr/bin/ssh-agent -s`
 /usr/bin/ssh-add
 ```
 
 ### Confirm connectivity
+
+#### remove any stale keys
+
+```shell
+ssh-keygen -f "$HOME/.ssh/known_hosts" -R workstation-001
+ssh-keygen -f "$HOME/.ssh/known_hosts" -R 192.168.11.22
+```
+
+#### test connection
 
 ```shell
 ssh <adminuser>@workstation-001
 exit
 ```
 
-#### Remove any stale keys
+#### copy over ssh public key
 
 ```shell
-ssh-keygen -f "/home/ansible/.ssh/known_hosts" -R workstation-001
-ssh-keygen -f "/home/ansible/.ssh/known_hosts" -R 192.168.11.22
-```
-
-### Setup ssh key
-
-```shell
+$
 ssh-copy-id <adminuser>@workstation-001
 exit
 ```
+#### test connection using ssh keys
+
 ### Confirm
 
 ```shell
