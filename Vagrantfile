@@ -1,9 +1,19 @@
 # -*- mode: ruby -*-
   # vi: set ft=ruby ts=2 sw=2 tw=0 et :
+# bump your IPs and include version when adding new boxes
+# https://app.vagrantup.com/debian
 
   role = File.basename(File.expand_path(File.dirname(__FILE__)))
 
   boxes = [
+    {
+      :name => "stretch64",
+      :box => "debian/stretch64",
+      :version => "9.4.0",
+      :ip => '10.0.0.10',
+      :cpu => "50",
+      :ram => "256"
+    },
     {
       :name => "precise64",
       :box => "ubuntu/precise64",
