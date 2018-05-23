@@ -4,20 +4,29 @@
   role = File.basename(File.expand_path(File.dirname(__FILE__)))
 
   boxes = [
-  #  {
-  #    :name => "ubuntu-1204",
-  #    :box => "bento/ubuntu-12.04",
-  #    :ip => '10.0.0.11',
-  #    :cpu => "50",
-  #    :ram => "256"
-  #  },
-  #  {
-  #    :name => "ubuntu-1404",
-  #    :box => "bento/ubuntu-14.04",
-  #    :ip => '10.0.0.12',
-  #    :cpu => "50",
-  #    :ram => "256"
-  #  },
+    {
+      :name => "precise64",
+      :box => "ubuntu/precise64",
+      :version => "20170427.0.0",
+      :ip => '10.0.0.11',
+      :cpu => "50",
+      :ram => "256"
+    },
+    {
+      :name => "trusty64",
+      :box => "ubuntu/trusty64",
+      :version => "20180510.0.5",
+      :ip => '10.0.0.12',
+      :cpu => "50",
+      :ram => "256"
+    },
+    {
+      :name => "ubuntu-1404",
+      :box => "bento/ubuntu-14.04",
+      :ip => '10.0.0.13',
+      :cpu => "50",
+      :ram => "256"
+    },
     {
       :name => "xenial64",
       :box => "ubuntu/xenial64",
@@ -26,25 +35,19 @@
       :cpu => "50",
       :ram => "256"
     },
-  #  {
-  #    :name => "debian-711",
-  #    :box => "bento/debian-7.11",
-  #    :ip => '10.0.0.14',
-  #    :cpu => "50",
-  #    :ram => "256"
-  #  },
-  #  {
-  #    :name => "debian-86",
-  #    :box => "bento/debian-8.6",
-  #    :ip => '10.0.0.15',
-  #    :cpu => "50",
-  #    :ram => "256"
-  #  },
+    {
+      :name => "centos6",
+      :box => "centos/6",
+      :version => "1804.02",
+      :ip => '10.0.0.14',
+      :cpu => "50",
+      :ram => "256"
+    },
     {
       :name => "centos7",
-      :box => "geerlingguy/centos7",
-      :version => "1.2.8",
-      :ip => '10.0.0.16',
+      :box => "centos/7",
+      :version => "1804.02",
+      :ip => '10.0.0.15',
       :cpu => "50",
       :ram => "256"
     },
