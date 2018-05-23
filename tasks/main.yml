@@ -5,10 +5,15 @@
 
 - name: install requirements
   become: true
+  package:
+   name   : python
+   state  : installed
+  when: ansible_distribution == 'Debian'
+
+- name: install requirements
+  become: true
   yum: name=libselinux-python state=installed
   when: ansible_distribution == 'CentOS'
-  tags: [ 'packages', 'shorewall' ]
-
 
 - name: "Remove our deployment user when state is absent"
   user:

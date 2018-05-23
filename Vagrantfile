@@ -21,16 +21,18 @@
       :ram => "256"
     },
     {
-      :name => "ubuntu-1404",
-      :box => "bento/ubuntu-14.04",
+      :name => "xenial64",
+      :box => "ubuntu/xenial64",
+      :version => "20180522.0.0",
+#      :version => "20171221.0.0",
       :ip => '10.0.0.13',
       :cpu => "50",
       :ram => "256"
     },
     {
-      :name => "xenial64",
-      :box => "ubuntu/xenial64",
-      :version => "20171221.0.0",
+      :name => "bionic64",
+      :box => "ubuntu/bionic64",
+      :version => "20180522.0.0",
       :ip => '10.0.0.13',
       :cpu => "50",
       :ram => "256"
@@ -39,7 +41,7 @@
       :name => "centos6",
       :box => "centos/6",
       :version => "1804.02",
-      :ip => '10.0.0.14',
+      :ip => '10.0.0.15',
       :cpu => "50",
       :ram => "256"
     },
@@ -47,7 +49,7 @@
       :name => "centos7",
       :box => "centos/7",
       :version => "1804.02",
-      :ip => '10.0.0.15',
+      :ip => '10.0.0.16',
       :cpu => "50",
       :ram => "256"
     },

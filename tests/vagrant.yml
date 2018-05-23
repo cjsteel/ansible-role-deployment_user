@@ -1,7 +1,16 @@
 ---
 - hosts: all
+  become: true
+  gather_facts: false
+  pre_tasks:
+
+    - name: "Set projects variables and ensure desired python(s) installed on nodes"
+      import_tasks: vagrant_pre_tasks.yml
+
+
+- hosts: all
   remote_user: ubuntu
-  sudo: true
+  become: true
   roles:
     - ../../
 
