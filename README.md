@@ -127,12 +127,19 @@ ssh <adminuser>@workstation-001
 
 Before creating our role's playbook we will set values for at least the following three vars in `group_vars/deployment_user/defaults.yml`:
 
-    deployment_user_username
-    deployment_user_uid
+```shell
+mkdir -p group_vars/deployer
+nano group_vars/deployer/defaults.yml
+```
+
+Add your deployment user name and uid as desires
+
+    deployment_user_username: deploy
+    deployment_user_uid: 888
 
 and
 
-    deployment_user_state
+    deployment_user_state: present
 
 #### Create group_vars directory
 
@@ -257,7 +264,7 @@ deployment_sudoers_d_files:
 ```
 
 
-Inventory Examples
+Inventorymkdir -p ~/projects/ace-dev Examples
 ------------------
 
 ### Production
@@ -335,7 +342,7 @@ You could probably use this role as a dependency, I have not tried this yet.
 Add something like this to the dependencies section of the roles meta/main.yml file. I usually move dependencies section to the top of the file so that it is readily noticable.
 
     dependencies:
-
+    
       - { role: deployment_user, deployment_user_username: 'deploy', deployment_user_uid: '879', deployment_user_state : 'present' }
       - { role: deployment_user, deployment_user_username: 'ubuntu', deployment_user_state: 'absent' }
       - { role: deployment_user, deployment_user_username: 'vagrant', deployment_user_state: 'absent' }
@@ -386,7 +393,7 @@ If your have created a new VM you may need to remove stale host keys from the co
 ### Confirm Connectivity
 
     ssh vagrant@localhost -p 2222 -i /home/controller_user/projects/project_name/vms/.vagrant/machines/db/virtualbox/private_key
-
+    
     The authenticity of host '[localhost]:2222 ([127.0.0.1]:2222)' can't be established.
     ECDSA key fingerprint is ...
     Are you sure you want to continue connecting (yes/no)? yes

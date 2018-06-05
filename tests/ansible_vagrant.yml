@@ -1,0 +1,24 @@
+--- # roles/firewall/tests/ansible_vagrant.yml
+
+- hosts: all
+  become: true
+  gather_facts: false
+  pre_tasks:
+
+    - name: "Set projects variables and ensure desired python(s) installed on nodes"
+      import_tasks: ansible_vagrant_python.yml
+
+- hosts: all
+  become: true
+  gather_facts: true
+  vars:
+
+    - reboot_debug: true 
+    - reboot_testing: true 
+    - reboot_target: true
+    - reboot_delay: 3       # Number of seconds to wait before starting to poll.
+    - reboot_pause: 60      # Pause after SSH port availablilty (allows for post boot activites)
+
+  roles:
+
+    - ../../

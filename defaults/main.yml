@@ -6,8 +6,11 @@
 #
 # overidden via group_vars/deployment_user/defaults.yml
 
+
 deployment_user_username        : 'deploy'
 deployment_user_home            : '/home/{{ deployment_user_username }}'
+deployment_user_home_mode       : '0750'
+# deployment_user_home_state      : 'absent' # not implemented
 deployment_user_uid             : '878'
 deployment_user_state           : 'present'
 
@@ -24,11 +27,6 @@ deployment_user_home_group     : '{{ deployment_user_system_groups[0] }}'
 
 deployment_user_sudo_group        : '{{ deployment_user_username }}'
 deployment_user_sudo_group_state  : '{{ deployment_user_state }}'
-
-# !!! DANGER in most cases home directories should only be removed after archiving!!!
-deployment_user_home            : '{{ "/home/" + deployment_user_username }}'
-deployment_user_home_mode       : '0750'
-# deployment_user_home_state      : 'absent' # not implemented
 
 deployment_user_shell           : '/bin/bash'
 deployment_user_comment         : 'Ansible deployment user'
